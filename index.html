@@ -140,7 +140,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 900px) { .heroimg { max-height: 80vh; } .hero .lead { font-size: 17px; } .hero .meta { font-size: 17px; } }
 .sect { max-width: 920px; margin: 0 auto; padding: 8px 16px 0; }
 .sect h2 { font-size: 15px; color: var(--wood); margin: 12px 0 0; letter-spacing: .04em; }
-.tiles { max-width: 920px; margin: 0 auto; padding: 10px 16px 8px; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tiles { max-width: 920px; margin: 0 auto; padding: 10px 16px 8px; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
 @media (min-width: 720px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .tile {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; text-decoration: none; color: var(--ink);
@@ -162,6 +162,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 900px) { .tile .td { font-size: 12.5px; } .tile .td.nowrap { white-space: nowrap; } .tile .td.nowrap wbr { display: none; } }
 .notes { max-width: 920px; margin: 0 auto; padding: 8px 16px 40px; }
 .notes p { font-size: 13px; color: var(--muted); margin: 6px 0; padding-left: 1em; text-indent: -1em; }
+/* メニューの説明: スマホは短い文（.sm）で2行まで、それより広い画面は元の文（.lg） */
+.tile .td .sm { display: none; }
+@media (max-width: 599px) { .tile .td .lg { display: none; } .tile .td .sm { display: inline; } .tile .td { -webkit-line-clamp: 2; } }
 /* スマホではメニューの説明とお願いの文字を少し小さく */
 @media (max-width: 599px) { .tile .td { font-size: 12px; } .notes p { font-size: 12px; } }
 @media (max-width: 380px) { .tile .td { font-size: 11.5px; } }
@@ -572,17 +575,17 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '<div class="sect"><h2>メニュー</h2></div>' +
       '<section class="tiles">' +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>', 'タイムテーブル') +
-          '<span class="td">ラーフェス全体で<wbr>どんなことが<wbr>起こるのか<wbr>見ることが<wbr>できます</span>', 'data-go="calendar"') +
+          '<span class="td"><span class="lg">ラーフェス全体で<wbr>どんなことが<wbr>起こるのか<wbr>見ることが<wbr>できます</span><span class="sm">ラーフェス全体の<wbr>動きが見られます</span></span>', 'data-go="calendar"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>', 'セッション一覧') +
-          '<span class="td">みんなが<wbr>登録した<wbr>セッションの<wbr>一覧を<wbr>確認できます</span>', 'data-go="list"') +
+          '<span class="td"><span class="lg">みんなが<wbr>登録した<wbr>セッションの<wbr>一覧を<wbr>確認できます</span><span class="sm">みんなのセッションを<wbr>確認できます</span></span>', 'data-go="list"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>', '場内マップ') +
-          '<span class="td">セッション会場や<wbr>食事の<wbr>場所を<wbr>確認できます</span>', 'data-go="map"') +
+          '<span class="td"><span class="lg">セッション会場や<wbr>食事の<wbr>場所を<wbr>確認できます</span><span class="sm">会場や食事の場所を<wbr>確認できます</span></span>', 'data-go="map"') +
         link(L.guide, tt('<svg class="i" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-1 5"/></svg>', '<span class="ph">ラーフェスの</span><span class="ph">歩き方</span>', true) +
-          '<span class="td nowrap">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span>') +
+          '<span class="td nowrap"><span class="lg">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span><span class="sm">はじめての方は、<wbr>まずお読みください</span></span>') +
         link(L.facebook, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>', 'FBグループ', true) +
-          '<span class="td">お知らせ・<wbr>参加者の交流・<wbr>告知はこちら</span>') +
+          '<span class="td"><span class="lg">お知らせ・<wbr>参加者の交流・<wbr>告知はこちら</span><span class="sm">お知らせ・交流・<wbr>告知はこちら</span></span>') +
         link(L.website, tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>', '公式サイト', true) +
-          '<span class="td">ラーフェス2026の<wbr>公式ページです</span>') +
+          '<span class="td"><span class="lg">ラーフェス2026の<wbr>公式ページです</span><span class="sm">ラーフェス2026の<wbr>公式ページです</span></span>') +
       '</section>' +
       '<div class="sect"><h2>お願い</h2></div>' +
       '<section class="notes">' +
