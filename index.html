@@ -164,7 +164,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .notes p { font-size: 13px; color: var(--muted); margin: 6px 0; padding-left: 1em; text-indent: -1em; }
 /* メニューの説明: スマホは短い文（.sm）で2行まで、それより広い画面は元の文（.lg） */
 .tile .td .sm { display: none; }
-@media (max-width: 599px) { .tile .td .lg { display: none; } .tile .td .sm { display: inline; } .tile .td { -webkit-line-clamp: 2; } }
+@media (max-width: 599px) { .tt .hide-sp { display: none; } .tile .td .lg { display: none; } .tile .td .sm { display: inline; } .tile .td { -webkit-line-clamp: 2; } }
 /* スマホではメニューの説明とお願いの文字を少し小さく */
 @media (max-width: 599px) { .tile .td { font-size: 12px; } .notes p { font-size: 12px; } }
 @media (max-width: 380px) { .tile .td { font-size: 11.5px; } }
@@ -580,7 +580,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
           '<span class="td"><span class="lg">みんなが<wbr>登録した<wbr>セッションの<wbr>一覧を<wbr>確認できます</span><span class="sm">みんなのセッションを<wbr>確認できます</span></span>', 'data-go="list"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>', '場内マップ') +
           '<span class="td"><span class="lg">セッション会場や<wbr>食事の<wbr>場所を<wbr>確認できます</span><span class="sm">会場や食事の場所を<wbr>確認できます</span></span>', 'data-go="map"') +
-        link(L.guide, tt('<svg class="i" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-1 5"/></svg>', '<span class="ph">ラーフェスの</span><span class="ph">歩き方</span>', true) +
+        link(L.guide, tt('<svg class="i" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-1 5"/></svg>', '<span class="ph hide-sp">ラーフェスの</span><span class="ph">歩き方</span>', true) +
           '<span class="td nowrap"><span class="lg">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span><span class="sm">はじめての方は、<wbr>まずお読みください</span></span>') +
         link(L.facebook, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>', 'FBグループ', true) +
           '<span class="td"><span class="lg">お知らせ・<wbr>参加者の交流・<wbr>告知はこちら</span><span class="sm">お知らせ・交流・<wbr>告知はこちら</span></span>') +
