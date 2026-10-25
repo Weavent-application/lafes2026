@@ -149,7 +149,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .tile .tt { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: var(--forest); }
 .tile .tt .ext { margin-left: auto; color: var(--muted); }
 .tile .tt .ext svg { width: 16px; height: 16px; }
-.tile .td { color: var(--muted); font-size: 13px; line-height: 1.6; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; text-wrap: pretty; }
+.tile .td { color: var(--muted); font-size: 13px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; text-wrap: pretty; }
 /* 小さいスマホでもタイトルを言葉の途中で折り返さない */
 .tile .tl { min-width: 0; }
 .tile .tl:not(:has(.ph)) { white-space: nowrap; }
@@ -159,7 +159,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (max-width: 899px) { .tile .td { -webkit-line-clamp: 3; } }
 /* PCは日付の下とメニューの下の余白を少し広げる */
 @media (min-width: 900px) { .hero { padding-bottom: 8px; } .tiles { padding-bottom: 20px; } }
-@media (min-width: 900px) { .tile .td { font-size: 12.5px; } .tile .td .ph { display: inline-block; } .tile .td.nowrap { white-space: nowrap; } }
+@media (min-width: 900px) { .tile .td { font-size: 12.5px; } .tile .td.nowrap { white-space: nowrap; } .tile .td.nowrap wbr { display: none; } }
 .notes { max-width: 920px; margin: 0 auto; padding: 8px 16px 40px; }
 .notes p { font-size: 13px; color: var(--muted); margin: 6px 0; padding-left: 1em; text-indent: -1em; }
 /* スマホではメニューの説明とお願いの文字を少し小さく */
@@ -281,7 +281,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 720px) { .modal { align-items: center; } .sheet { border-radius: 20px; padding: 24px 26px; } }
 .sheet h2 { margin: 0 0 4px; font-size: 21px; color: var(--forest); line-height: 1.4; }
 .sheet .sub { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
-.sheet .desc { white-space: pre-wrap; margin: 12px 0; overflow-wrap: anywhere; }
+.sheet .desc { white-space: pre-wrap; margin: 18px 0 14px; overflow-wrap: anywhere; font-size: 16px; line-height: 1.9; color: var(--ink); font-weight: 500; }
 .sheet .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; margin-top: 18px; }
 .sheet .stack { display: grid; gap: 10px; margin-top: 18px; }
 .sheet .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -571,17 +571,17 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '<div class="sect"><h2>メニュー</h2></div>' +
       '<section class="tiles">' +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>', 'タイムテーブル') +
-          '<span class="td"><span class="ph">ラーフェス全体でどんなことが起こるのか</span><span class="ph">見ることができます</span></span>', 'data-go="calendar"') +
+          '<span class="td">ラーフェス全体で<wbr>どんなことが<wbr>起こるのか<wbr>見ることが<wbr>できます</span>', 'data-go="calendar"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>', 'セッション一覧') +
-          '<span class="td"><span class="ph">みんなが登録したセッションの一覧を</span><span class="ph">確認できます</span></span>', 'data-go="list"') +
+          '<span class="td">みんなが<wbr>登録した<wbr>セッションの<wbr>一覧を<wbr>確認できます</span>', 'data-go="list"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>', '場内マップ') +
-          '<span class="td"><span class="ph">セッション会場や食事の場所を</span><span class="ph">確認できます</span></span>', 'data-go="map"') +
+          '<span class="td">セッション会場や<wbr>食事の<wbr>場所を<wbr>確認できます</span>', 'data-go="map"') +
         link(L.guide, tt('<svg class="i" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-1 5"/></svg>', '<span class="ph">ラーフェスの</span><span class="ph">歩き方</span>', true) +
-          '<span class="td nowrap">はじめての方は、まずこちらをお読みください</span>') +
+          '<span class="td nowrap">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span>') +
         link(L.facebook, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>', 'FBグループ', true) +
-          '<span class="td"><span class="ph">お知らせ・参加者の交流・</span><span class="ph">告知はこちら</span></span>') +
+          '<span class="td">お知らせ・<wbr>参加者の交流・<wbr>告知はこちら</span>') +
         link(L.website, tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>', '公式サイト', true) +
-          '<span class="td"><span class="ph">ラーフェス2026の</span><span class="ph">公式ページです</span></span>') +
+          '<span class="td">ラーフェス2026の<wbr>公式ページです</span>') +
       '</section>' +
       '<div class="sect"><h2>お願い</h2></div>' +
       '<section class="notes">' +
