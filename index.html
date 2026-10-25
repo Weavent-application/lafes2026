@@ -888,9 +888,10 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     let html = '';
     for (let m = toMin(day.start) + (isEnd ? step : 0); m <= toMin(day.end) - (isEnd ? 0 : step); m += step) {
       const t = toHHMM(m);
-      // 基本枠の中の時刻は選べないようにし、枠の名前を添える
-      const f = fixedOf(day.date).find(x => isEnd ? (toMin(x.start) < m && m <= toMin(x.end)) : (toMin(x.start) <= m && m < toMin(x.end)));
-      html += '<option value="' + t + '"' + (f ? ' disabled' : '') + (t === selected && !f ? ' selected' : '') + '>' + t + (f ? '（' + esc(f.title) + '）' : '') + '</option>';
+      // 基本枠の中の時刻は選択肢に出さない
+      const inFixed = fixedOf(day.date).some(x => isEnd ? (toMin(x.start) < m && m <= toMin(x.end)) : (toMin(x.start) <= m && m < toMin(x.end)));
+      if (inFixed) continue;
+      html += '<option value="' + t + '"' + (t === selected ? ' selected' : '') + '>' + t + '</option>';
     }
     return html;
   }
@@ -991,10 +992,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       const d = dayOf(form.date.value), st = form.start.value;
       const length = Math.max(toMin(form.end.value) - toMin(lastStart), state.config.slotMinutes) || 60;
       form.start.innerHTML = timeOptions(d, st, false);
-      if (!form.start.value || form.start.selectedOptions[0].disabled) {
-        const first = [...form.start.options].find(o => !o.disabled);
-        if (first) first.selected = true;
-      }
+      if (!form.start.value) form.start.selectedIndex = 0;
       const want = toHHMM(endFor(d, toMin(form.start.value), length));
       form.end.innerHTML = timeOptions(d, want, true);
       lastStart = form.start.value;
