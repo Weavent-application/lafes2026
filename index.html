@@ -868,12 +868,29 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     });
   }
 
+  // 事務局の基本枠（開場・受付、オープニング、クロージング）。この時間にはセッションを入れられない
+  const fixedOf = date => state.config.fixed.filter(f => f.date === date);
+  const fixedHit = (date, a, b) => fixedOf(date).find(f => toMin(f.start) < b && a < toMin(f.end));
+  // 開始 m が基本枠の中なら、枠の終わりまでずらす
+  function skipFixed(date, m) {
+    let f;
+    while ((f = fixedOf(date).find(x => toMin(x.start) <= m && m < toMin(x.end)))) m = toMin(f.end);
+    return m;
+  }
+  // 開始から length 分の終了。次の基本枠や、その日の終わりを越えないようにする
+  function endFor(day, startMin, length) {
+    const next = fixedOf(day.date).map(f => toMin(f.start)).filter(m => m > startMin);
+    return Math.min(startMin + length, toMin(day.end), ...next);
+  }
+
   function timeOptions(day, selected, isEnd) {
     const step = state.config.slotMinutes;
     let html = '';
     for (let m = toMin(day.start) + (isEnd ? step : 0); m <= toMin(day.end) - (isEnd ? 0 : step); m += step) {
       const t = toHHMM(m);
-      html += '<option' + (t === selected ? ' selected' : '') + '>' + t + '</option>';
+      // 基本枠の中の時刻は選べないようにし、枠の名前を添える
+      const f = fixedOf(day.date).find(x => isEnd ? (toMin(x.start) < m && m <= toMin(x.end)) : (toMin(x.start) <= m && m < toMin(x.end)));
+      html += '<option value="' + t + '"' + (f ? ' disabled' : '') + (t === selected && !f ? ' selected' : '') + '>' + t + (f ? '（' + esc(f.title) + '）' : '') + '</option>';
     }
     return html;
   }
@@ -898,7 +915,14 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       }
       s.start = toHHMM(Math.max(toMin(day.start), Math.min(next, toMin(day.end) - 60)));
     }
-    if (!s.end) s.end = toHHMM(Math.min(toMin(s.start) + 60, toMin(day.end)));
+    if (!edit) {
+      // 開始が基本枠の中なら枠の後ろへ。後ろに空きがなければ、その日の最初の空きにする
+      let m = skipFixed(s.date, toMin(s.start));
+      if (m >= toMin(day.end)) m = skipFixed(s.date, toMin(day.start));
+      if (toHHMM(m) !== s.start) { s.start = toHHMM(m); s.end = ''; }
+      if (s.end && fixedHit(s.date, toMin(s.start), toMin(s.end))) s.end = '';
+    }
+    if (!s.end) s.end = toHHMM(endFor(day, toMin(s.start), 60));
     // 画像: keep=そのまま / new=差し替え / remove=外す
     const img = { mode: 'keep', data: null };
 
@@ -967,13 +991,21 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       const d = dayOf(form.date.value), st = form.start.value;
       const length = Math.max(toMin(form.end.value) - toMin(lastStart), state.config.slotMinutes) || 60;
       form.start.innerHTML = timeOptions(d, st, false);
-      if (!form.start.value) form.start.selectedIndex = 0;
-      const want = toHHMM(Math.min(toMin(form.start.value) + length, toMin(d.end)));
+      if (!form.start.value || form.start.selectedOptions[0].disabled) {
+        const first = [...form.start.options].find(o => !o.disabled);
+        if (first) first.selected = true;
+      }
+      const want = toHHMM(endFor(d, toMin(form.start.value), length));
       form.end.innerHTML = timeOptions(d, want, true);
       lastStart = form.start.value;
     };
     const checkOverlap = () => {
       const v = form.venue.value, d = form.date.value, a = toMin(form.start.value), b = toMin(form.end.value);
+      const fixed = fixedHit(d, a, b);
+      if (fixed) {
+        document.getElementById('warn').innerHTML = '<div class="warn">「' + esc(fixed.title) + '」（' + esc(fixed.start) + '〜' + esc(fixed.end) + '）の時間にはセッションを入れられません。時間を変えてください。</div>';
+        return;
+      }
       const hits = v && v !== 'その他' ? state.sessions.filter(x => x.venue === v && x.date === d && (!edit || x.id !== edit.id) && toMin(x.start) < b && a < toMin(x.end)) : [];
       document.getElementById('warn').innerHTML = hits.length
         ? '<div class="warn">同じ場所・時間に「' + hits.map(h => esc(h.title)).join('」「') + '」があります。このまま登録もできます。当日はお互いにスペースを調整してください。</div>' : '';
@@ -998,6 +1030,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       if (!data.venue) return stop('開催場所を選んでください。', form.venue);
       if (data.venue === 'その他' && !data.venueOther.trim()) return stop('「その他」の場所を書いてください。', form.venueOther);
       if (!data.description.trim()) return stop('セッション内容を書いてください。', form.description);
+      const fixed = fixedHit(data.date, toMin(data.start), toMin(data.end));
+      if (fixed) return stop('「' + fixed.title + '」（' + fixed.start + '〜' + fixed.end + '）の時間にはセッションを入れられません。時間を変えてください。', form.start);
       err.textContent = '';
       const btn = document.getElementById('saveBtn');
       btn.disabled = true; btn.textContent = img.mode === 'new' ? '画像を送っています…' : '送信中…';
