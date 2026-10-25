@@ -292,12 +292,13 @@ dl.info { display: grid; grid-template-columns: 3.4em 1fr; gap: 6px 12px; margin
 dl.info dt { color: var(--muted); font-weight: 600; font-size: 13px; }
 dl.info dd { margin: 0; font-weight: 700; font-size: 17px; line-height: 1.5; }
 dl.info dd.when { color: var(--forest); font-size: 18px; }
-.sheet h2.dtitle { font-size: clamp(23px, 6vw, 28px); line-height: 1.35; margin: 2px 0 6px; }
+.sheet h2.dtitle { font-size: clamp(26px, 7vw, 32px); line-height: 1.35; margin: 2px 0 6px; word-break: auto-phrase; text-wrap: balance; }
 .dactions { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
-.dactions .btn.close { width: 100%; min-height: 48px; }
-.dactions .sub2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.dactions .sub2 .btn { min-height: 38px; padding: 0 12px; font-size: 13.5px; font-weight: 600; color: var(--muted); background: transparent; }
-.dactions .btn.del { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); }
+.dactions .btn.close { width: 100%; min-height: 56px; }
+/* 修正・削除は閉じるより一段下げて控えめに */
+.dactions .sub2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+.dactions .sub2 .btn { min-height: 34px; padding: 0 12px; font-size: 12.5px; font-weight: 500; color: var(--muted); background: transparent; border-color: var(--line); opacity: .85; }
+.dactions .btn.del { color: color-mix(in srgb, var(--danger) 70%, var(--muted)); border-color: color-mix(in srgb, var(--danger) 25%, var(--line)); }
 .linkbtn { background: none; border: 0; padding: 0; color: var(--forest); text-decoration: underline; font-weight: 600; font-size: 13.5px; }
 .note { font-size: 12.5px; color: var(--muted); margin: 12px 0 0; }
 
