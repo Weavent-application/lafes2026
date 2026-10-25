@@ -153,7 +153,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 /* 小さいスマホでもタイトルを言葉の途中で折り返さない */
 .tile .tl { min-width: 0; }
 .tile .tl:not(:has(.ph)) { white-space: nowrap; }
-@media (max-width: 380px) { .tile .tt { font-size: 14px; gap: 5px; } .tile .td { font-size: 12px; } .tile .tt svg.i { width: 18px; height: 18px; } .tile .tt .ext svg { width: 14px; height: 14px; } }
+@media (max-width: 380px) { .tile .tt { font-size: 14px; gap: 5px; } .tile .td { font-size: 11.5px; } .tile .tt svg.i { width: 18px; height: 18px; } .tile .tt .ext svg { width: 14px; height: 14px; } }
 @media (max-width: 340px) { .tile .tt svg.i { display: none; } }
 /* 説明文はスマホで3行まで、PCでは2行まで。歩き方の説明はPCで1行に収める */
 @media (max-width: 899px) { .tile .td { -webkit-line-clamp: 3; } }
@@ -162,6 +162,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 900px) { .tile .td { font-size: 12.5px; } .tile .td .ph { display: inline-block; } .tile .td.nowrap { white-space: nowrap; } }
 .notes { max-width: 920px; margin: 0 auto; padding: 8px 16px 40px; }
 .notes p { font-size: 13px; color: var(--muted); margin: 6px 0; padding-left: 1em; text-indent: -1em; }
+/* スマホではメニューの説明とお願いの文字を少し小さく */
+@media (max-width: 599px) { .tile .td { font-size: 12px; } .notes p { font-size: 12px; } }
+@media (max-width: 380px) { .tile .td { font-size: 11.5px; } }
 .count { display: inline-flex; align-items: baseline; gap: 6px; font-weight: 700; color: var(--wood); }
 .count b { font-family: "Zen Maru Gothic", sans-serif; font-size: 26px; }
 
