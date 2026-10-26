@@ -228,9 +228,11 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 }
 .band {
   position: absolute; left: var(--timecol); right: 0; z-index: 1; pointer-events: none;
-  background: var(--fixed); opacity: .9; display: flex; align-items: center; justify-content: center;
+  background: var(--fixed); opacity: .9; display: flex; align-items: center; justify-content: flex-start;
   font-size: 12px; font-weight: 700; color: var(--muted); border-top: 1px dashed var(--wood); border-bottom: 1px dashed var(--wood);
 }
+/* 枠の名前は左端の会場（SKY FIELD）の列の下あたりに出す */
+.band span { width: var(--col); text-align: center; }
 .nowline { position: absolute; left: var(--timecol); right: 0; height: 2px; background: var(--accent); z-index: 2; pointer-events: none; }
 
 /* リスト（タイムテーブルのリスト表示） */
@@ -659,7 +661,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
     // 事務局の基本枠（全会場にかかる帯）
     c.fixed.filter(f => f.date === state.day).forEach(f => {
-      html += '<div class="band" style="top:' + (44 + px(toMin(f.start))) + 'px;height:' + (px(toMin(f.end)) - px(toMin(f.start))) + 'px">' + esc(f.title) + '（' + esc(f.start) + '–' + esc(f.end) + '）</div>';
+      html += '<div class="band" style="top:' + (44 + px(toMin(f.start))) + 'px;height:' + (px(toMin(f.end)) - px(toMin(f.start))) + 'px"><span>' + esc(f.title) + '</span></div>';
     });
 
     if (state.day === todayStr()) {
