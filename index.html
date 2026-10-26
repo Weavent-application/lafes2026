@@ -457,9 +457,11 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
   // ---------- 画像 ----------
   // トップ画像・マップ。手元では assets/ のファイル、Apps Script では getAsset で受け取る
+  const ASSET_VER = '20261026';
   const assetCache = {};
   function assetUrl(name) {
-    if (!IS_GAS) return Promise.resolve('assets/' + name + (name === 'logo' ? '.png' : '.jpg'));
+    // 画像を差し替えたら ASSET_VER を変える（ブラウザに古い画像が残らないように）
+    if (!IS_GAS) return Promise.resolve('assets/' + name + (name === 'logo' ? '.png' : '.jpg') + '?v=' + ASSET_VER);
     if (!assetCache[name]) assetCache[name] = call('getAsset', name).catch(e => { delete assetCache[name]; throw e; });
     return assetCache[name];
   }
