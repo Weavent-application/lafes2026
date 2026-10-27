@@ -462,7 +462,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
   // ---------- 画像 ----------
   // トップ画像・マップ。手元では assets/ のファイル、Apps Script では getAsset で受け取る
-  const ASSET_VER = '20261026';
+  const ASSET_VER = '20261027';
   const assetCache = {};
   function assetUrl(name) {
     // 画像を差し替えたら ASSET_VER を変える（ブラウザに古い画像が残らないように）
@@ -497,6 +497,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   // 画像が無いときは、セッション名の頭文字を出す
   function imgHtml(s) {
     if (s.imageId) return '<img data-img="' + esc(s.imageId) + '" alt="">';
+    if (s.imageFile) return '<img src="assets/' + esc(s.imageFile) + '?v=' + ASSET_VER + '" alt="">';
     return '<div class="noimg" aria-hidden="true">' + esc((s.title || '・').trim().charAt(0)) + '</div>';
   }
 
@@ -844,7 +845,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     const f = state.config.fixed[i];
     if (!f) return;
     openModal(
-      (f.imageId ? '<div class="dimg">' + imgHtml(f) + '</div>' : '') +
+      (f.imageId || f.imageFile ? '<div class="dimg">' + imgHtml(f) + '</div>' : '') +
       '<h2 class="dtitle">' + esc(f.title) + '</h2>' +
       '<dl class="info">' +
         '<dt>日時</dt><dd class="when">' + esc(dayLabel(f.date)) + ' ' + esc(f.start) + '〜' + esc(f.end) + '</dd>' +
@@ -1156,7 +1157,12 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       venues: ['SKY FIELD', 'SKY ARC', 'GARAGE LODGE', 'MOONBEAR DECK', 'KIDS BASE', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'Main Street', 'Podcast Studio', 'その他'],
       fixed: [
         { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付' },
-        { date: '2026-11-12', start: '13:00', end: '14:00', title: 'オープニングセッション' },
+        {
+          date: '2026-11-12', start: '13:00', end: '14:00', title: 'オープニングセッション',
+          host: 'ラーフェス実行委員会', venue: 'SKY FIELD',
+          description: 'ラーフェスはいつもここからはじまる。\nくれぐれも遅れずにスカイフィールドに集まってね。',
+          imageFile: 'opening.jpg',
+        },
         {
           date: '2026-11-13', start: '15:30', end: '18:30', title: '芋煮でつながっていいとも！',
           host: '全日本芋煮会同好会アンディさん、藤田祐司さん、ラーフェス実行委員会', venue: 'SKY FIELD',
