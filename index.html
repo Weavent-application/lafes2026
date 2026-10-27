@@ -323,7 +323,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
 .summary { display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin: 12px 0; }
 .sumimg { width: 88px; height: 60px; border-radius: 10px; overflow: hidden; }
-.summary .t { font-weight: 700; display: block; line-height: 1.45; }
+.summary .t { font-weight: 700; display: block; line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.summary > div { min-width: 0; }
 .summary .s { color: var(--muted); font-size: 13px; display: block; }
 .big-ok { font-size: 44px; line-height: 1; margin: 6px 0 4px; }
 
@@ -418,7 +419,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   // 場所ごとの色。マップの雰囲気に寄せた色相。「その他」はグレー
   const VENUE_HUES = {
     'SKY FIELD': 135, 'SKY ARC': 205, 'GARAGE LODGE': 28, 'MOONBEAR DECK': 265, 'KIDS BASE': 330,
-    'TAKIBI BASE': 5, 'SAUNA RIVER': 180, 'MORINO HIROBA': 90, 'Main Street': 45,
+    'TAKIBI BASE': 5, 'SAUNA RIVER': 180, 'MORINO HIROBA': 90, 'MORINO HIROBA -MOMI': 70,
+    'MORINO HIROBA -MATSU': 110, 'Main Street': 45, 'Podcast Studio': 300,
   };
   const vstyle = v => {
     if (v in VENUE_HUES) return '--h:' + VENUE_HUES[v] + ';--s:48%;';
@@ -1027,7 +1029,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       if (fixed) return stop('「' + fixed.title + '」（' + fixed.start + '〜' + fixed.end + '）の時間にはセッションを入れられません。時間を変えてください。', form.start);
       err.textContent = '';
       const btn = document.getElementById('saveBtn');
-      btn.disabled = true; btn.textContent = img.mode === 'new' ? '画像を送っています…' : '送信中…';
+      btn.disabled = true; btn.textContent = edit ? '更新中…' : '登録中…';
       const imageArg = img.mode === 'new' ? img.data : (img.mode === 'remove' ? '' : null);
       const p = edit
         ? call('updateSession', edit.id, data, imageArg, edit.updatedAt)
@@ -1127,7 +1129,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         { date: '2026-11-13', label: '11/13(金)', start: '07:00', end: '23:00' },
         { date: '2026-11-14', label: '11/14(土)', start: '07:00', end: '15:00' },
       ],
-      venues: ['SKY FIELD', 'SKY ARC', 'GARAGE LODGE', 'MOONBEAR DECK', 'KIDS BASE', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA', 'Main Street', 'その他'],
+      venues: ['SKY FIELD', 'SKY ARC', 'GARAGE LODGE', 'MOONBEAR DECK', 'KIDS BASE', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'Main Street', 'Podcast Studio', 'その他'],
       fixed: [
         { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付' },
         { date: '2026-11-12', start: '13:00', end: '14:00', title: 'オープニングセッション' },
