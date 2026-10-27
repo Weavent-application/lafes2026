@@ -255,6 +255,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .filters input[type=search] { flex: 1 1 220px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 16px; }
 .filters label { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 600; color: var(--muted); }
 .filters input[type=checkbox] { width: 18px; height: 18px; }
+/* 検索窓は1行使い、その下に会場のプルダウンと「終わったものも表示」 */
+.filters input[type=search] { flex-basis: 100%; }
+.filters select { flex: 1 1 220px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; }
 .scard {
   width: 100%; display: grid; grid-template-columns: 1fr 116px; gap: 12px; align-items: center; text-align: left;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; margin-bottom: 10px;
@@ -267,6 +270,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   #results .group h3 { grid-column: 1 / -1; }
 }
 .scard .s { color: var(--muted); font-size: 13px; display: block; }
+/* 主催・場所は1行で、長いときは「…」で省略する */
+.scard > div:first-child { min-width: 0; }
+.scard .s.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .scard .w { color: var(--forest); font-weight: 700; font-size: 13px; display: block; }
 .thumb { width: 116px; height: 74px; border-radius: 10px; overflow: hidden; background: var(--forest-soft); }
 .thumb img, .dimg img, .sumimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -428,7 +434,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   const state = {
     config: null, sessions: [], baseUrl: '',
     view: 'top', day: null, mode: null, // mode: 'grid' | 'list'
-    q: '', showPast: false, zoom: 1,
+    q: '', venue: '', showPast: false, zoom: 1,
   };
   const $app = document.getElementById('app');
   const $modal = document.getElementById('modal');
@@ -774,7 +780,10 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         '<h2 class="ptitle">セッション一覧</h2>' +
         '<p class="hint">この後開催されるセッションはこちら！ タッチすると詳細が表示されます。</p>' +
         '<div class="filters">' +
-          '<input type="search" id="q" placeholder="セッション名・名前・場所でさがす" value="' + esc(state.q) + '" aria-label="さがす">' +
+          '<input type="search" id="q" placeholder="セッション名・主催者名でさがす" value="' + esc(state.q) + '" aria-label="セッション名・主催者名でさがす">' +
+          '<select id="venue" aria-label="会場でさがす"><option value="">すべての会場</option>' +
+            state.config.venues.map(v => '<option value="' + esc(v) + '"' + (state.venue === v ? ' selected' : '') + '>' + esc(v) + '</option>').join('') +
+          '</select>' +
           '<label><input type="checkbox" id="past"' + (state.showPast ? ' checked' : '') + '>終わったものも表示</label>' +
         '</div>' +
         '<div id="results"></div>' +
@@ -782,6 +791,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     renderResults();
     document.getElementById('q').addEventListener('input', e => { state.q = e.target.value; renderResults(); });
     document.getElementById('past').addEventListener('change', e => { state.showPast = e.target.checked; renderResults(); });
+    document.getElementById('venue').addEventListener('change', e => { state.venue = e.target.value; renderResults(); });
   }
 
   function renderResults() {
@@ -791,10 +801,11 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     const fixed = state.config.fixed.filter(f => !f.notSession).map(f => Object.assign({ fixedIndex: state.config.fixed.indexOf(f) }, f));
     const list = state.sessions.concat(fixed).sort(byTime)
       .filter(s => state.showPast || endKey(s) > now)
+      .filter(s => !state.venue || s.venue === state.venue)
       .filter(s => !q || [s.title, s.host, venueName(s), s.description].join(' ').toLowerCase().indexOf(q) >= 0);
     const $r = document.getElementById('results');
     if (!list.length) {
-      $r.innerHTML = '<p class="empty">' + (q ? '見つかりませんでした。' : 'この後のセッションはまだありません。') + '<br><button class="btn accent" type="button" data-new style="margin-top:14px">＋ セッションを登録する</button></p>';
+      $r.innerHTML = '<p class="empty">' + (q || state.venue ? '見つかりませんでした。' : 'この後のセッションはまだありません。') + '<br><button class="btn accent" type="button" data-new style="margin-top:14px">＋ セッションを登録する</button></p>';
       return;
     }
     const card = s => {
@@ -803,7 +814,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       return '<button type="button" class="scard" ' + (isFixed ? 'data-fixed="' + s.fixedIndex + '"' : 'data-id="' + esc(s.id) + '"') + ' style="' + vstyle(s.venue) + '"><div>' +
         '<span class="w">' + esc(dayLabel(s.date)) + ' ' + esc(s.start) + '–' + esc(s.end) + (isFixed ? '<span class="tag">全体</span>' : '') + (live ? '<span class="tag now">開催中</span>' : '') + '</span>' +
         '<span class="t">' + esc(s.title) + '</span>' +
-        '<span class="s">' + [esc(s.host || ''), s.venue ? '<span class="nw">' + esc(venueName(s)) + '</span>' : ''].filter(Boolean).join('・') + '</span>' +
+        (s.host ? '<span class="s one">主催：' + esc(s.host) + '</span>' : '') +
+        (s.venue ? '<span class="s one">場所：' + esc(venueName(s)) + '</span>' : '') +
         '</div><div class="thumb">' + imgHtml(s) + '</div></button>';
     };
     const live = list.filter(s => startKey(s) <= now && now < endKey(s));
