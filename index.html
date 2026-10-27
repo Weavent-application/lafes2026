@@ -220,7 +220,8 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   :root:not([data-theme="light"]) .vdot { background: hsl(var(--h) var(--s) 60%); }
 }
 .band {
-  position: absolute; left: var(--timecol); right: 0; z-index: 1; pointer-events: none;
+  position: absolute; left: var(--timecol); right: 0; z-index: 1; cursor: pointer;
+  font-family: inherit; padding: 0; border-left: 0; border-right: 0; border-radius: 0;
   background: var(--fixed); opacity: .9; display: flex; align-items: center; justify-content: flex-start;
   font-size: 12px; font-weight: 700; color: var(--muted); border-top: 1px dashed var(--wood); border-bottom: 1px dashed var(--wood);
 }
@@ -658,7 +659,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
     // 事務局の基本枠（全会場にかかる帯）
     c.fixed.filter(f => f.date === state.day).forEach(f => {
-      html += '<div class="band" style="top:' + (44 + px(toMin(f.start))) + 'px;height:' + (px(toMin(f.end)) - px(toMin(f.start))) + 'px"><span>' + esc(f.title) + '</span></div>';
+      html += '<button type="button" class="band" data-fixed="' + c.fixed.indexOf(f) + '" style="top:' + (44 + px(toMin(f.start))) + 'px;height:' + (px(toMin(f.end)) - px(toMin(f.start))) + 'px"><span>' + esc(f.title) + '</span></button>';
     });
 
     if (state.day === todayStr()) {
@@ -712,7 +713,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       const s = it.s, h = s.start.slice(0, 2);
       if (h !== hour) { if (hour !== null) html += '</div>'; hour = h; html += '<div class="group"><h3>' + Number(h) + '時台</h3>'; }
       if (it.fixed) {
-        html += '<div class="item fixed"><div class="when">' + esc(s.start) + '<small>–' + esc(s.end) + '</small></div><div><span class="t">' + esc(s.title) + '</span><span class="s">全体</span></div></div>';
+        html += '<button type="button" class="item fixed" data-fixed="' + state.config.fixed.indexOf(s) + '"><div class="when">' + esc(s.start) + '<small>–' + esc(s.end) + '</small></div><div><span class="t">' + esc(s.title) + '</span><span class="s">' + (s.venue ? '<span class="nw">' + esc(venueName(s)) + '</span>・' : '') + '全体</span></div></button>';
       } else {
         html += '<button type="button" class="item" data-id="' + esc(s.id) + '" style="' + vstyle(s.venue) + '"><div class="when">' + esc(s.start) + '<small>–' + esc(s.end) + '</small></div>' +
           '<div><span class="t">' + esc(s.title) + '</span>' +
@@ -835,6 +836,26 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
           '<button class="btn del" type="button" data-del="' + esc(s.id) + '">削除する</button>' +
         '</div>' +
       '</div>'
+    );
+  }
+
+  // 事務局の基本枠の詳細：読むだけ（修正・削除・URLコピーは出さない）
+  function showFixed(i) {
+    const f = state.config.fixed[i];
+    if (!f) return;
+    openModal(
+      (f.imageId ? '<div class="dimg">' + imgHtml(f) + '</div>' : '') +
+      '<h2 class="dtitle">' + esc(f.title) + '</h2>' +
+      '<dl class="info">' +
+        '<dt>日時</dt><dd class="when">' + esc(dayLabel(f.date)) + ' ' + esc(f.start) + '〜' + esc(f.end) + '</dd>' +
+        '<dt>場所</dt>' + (f.venue
+          ? '<dd style="' + vstyle(f.venue) + '"><span style="white-space:nowrap"><span class="vdot" aria-hidden="true"></span>' + esc(venueName(f)) + '</span>　<button type="button" class="linkbtn" data-go="map">マップで見る</button></dd>'
+          : '<dd>全体</dd>') +
+        (f.host ? '<dt>主催</dt><dd>' + esc(f.host) + '</dd>' : '') +
+      '</dl>' +
+      (f.description ? '<div class="desc">' + esc(f.description) + '</div>' : '') +
+      '<p class="note">事務局が用意する全体の枠です。この時間にはセッションを登録できません。</p>' +
+      '<div class="dactions"><button class="btn close" type="button" data-close>閉じる</button></div>'
     );
   }
 
@@ -1062,7 +1083,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
   // ---------- 操作 ----------
   document.addEventListener('click', ev => {
-    const t = ev.target.closest('[data-go],[data-new],[data-day],[data-mode],[data-id],[data-close],[data-edit],[data-del],[data-share],[data-zoom],.col');
+    const t = ev.target.closest('[data-go],[data-new],[data-day],[data-mode],[data-id],[data-close],[data-edit],[data-del],[data-share],[data-zoom],[data-fixed],.col');
     if (!t) { if (ev.target === $modal) closeModal(); return; }
     if (t.hasAttribute('data-close')) return closeModal();
     if (t.hasAttribute('data-go')) return go(t.getAttribute('data-go'));
@@ -1070,6 +1091,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     if (t.hasAttribute('data-day')) { state.day = t.getAttribute('data-day'); return render(); }
     if (t.hasAttribute('data-mode')) { state.mode = t.getAttribute('data-mode'); return render(); }
     if (t.hasAttribute('data-id')) return showDetail(t.getAttribute('data-id'));
+    if (t.hasAttribute('data-fixed')) return showFixed(Number(t.getAttribute('data-fixed')));
     if (t.hasAttribute('data-edit')) {
       const s = state.sessions.find(x => x.id === t.getAttribute('data-edit'));
       if (s) showForm(s, { id: s.id, updatedAt: s.updatedAt });
@@ -1135,7 +1157,11 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       fixed: [
         { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付' },
         { date: '2026-11-12', start: '13:00', end: '14:00', title: 'オープニングセッション' },
-        { date: '2026-11-13', start: '15:30', end: '18:30', title: '芋煮会' },
+        {
+          date: '2026-11-13', start: '15:30', end: '18:30', title: '芋煮でつながっていいとも！',
+          host: '全日本芋煮会同好会アンディさん、藤田祐司さん、ラーフェス実行委員会', venue: 'SKY FIELD',
+          description: '今年も魅力的な人がたくさん集まるラーフェス2026。心も身体もあたたまる「芋煮でつながっていいとも！」で、芋煮で出会ってつながって深めましょう。\n\nチームに入らなくなってしまうので、くれぐれも遅れずにご参加くださいね。',
+        },
         { date: '2026-11-14', start: '14:00', end: '15:00', title: 'クロージングセッション' },
       ],
       slotMinutes: 15,
