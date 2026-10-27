@@ -180,7 +180,12 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .seg button[aria-pressed="true"] { background: var(--forest-soft); color: var(--forest); }
 .toolbar + .hint { padding: 0 16px; }
 
-.grid-wrap { overflow: auto; margin: 0 16px 32px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-height: calc(100vh - 190px - var(--tabbar)); }
+/* 縦はページごとスクロールし、表の中は横だけ動かす（スマホで表を触るとページが下へ進めず迷うため） */
+.grid-wrap { overflow-x: auto; overflow-y: hidden; margin: 0 16px 32px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+/* 会場名の行の写し。表の見出しの真上に重ねて置き、下へスクロールしてもヘッダーの下に残す。横は表に合わせて動かす */
+.ghead { position: sticky; top: var(--barh, 0px); z-index: 6; height: 44px; margin: 0 17px -44px; transform: translateY(1px); overflow: hidden; background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; }
+.ghead .grid { will-change: transform; }
+.ghead .corner { position: absolute; left: 0; top: 0; width: var(--timecol); z-index: 2; }
 .grid { position: relative; display: grid; min-width: max-content; }
 .grid .corner, .grid .vhead {
   position: sticky; top: 0; z-index: 3; background: var(--surface); border-bottom: 1px solid var(--line);
@@ -625,7 +630,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         ? '<p class="hint">空いているところを押すと、その時間・場所で登録できます。左右にスクロールすると、ほかの会場も見られます。</p>' + gridHtml()
         : listHtml());
 
-    if (state.mode === 'grid') scrollGridToNow();
+    if (state.mode === 'grid') { syncGridHead(); scrollGridToNow(); }
   }
 
   function gridHtml() {
@@ -638,7 +643,10 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     const height = px(endMin);
     const items = state.sessions.filter(s => s.date === state.day);
 
-    let html = '<div class="grid-wrap" id="gridWrap"><div class="grid" style="grid-template-columns: var(--timecol) repeat(' + c.venues.length + ', minmax(var(--col), max-content));">';
+    let head = '<div class="ghead" id="gridHead" aria-hidden="true"><div class="grid"><div class="corner"></div>';
+    c.venues.forEach(v => { head += '<div class="vhead" style="' + vstyle(v) + '">' + esc(v) + '</div>'; });
+    head += '</div></div>';
+    let html = head + '<div class="grid-wrap" id="gridWrap"><div class="grid" style="grid-template-columns: var(--timecol) repeat(' + c.venues.length + ', minmax(var(--col), max-content));">';
     html += '<div class="corner"></div>';
     c.venues.forEach(v => { html += '<div class="vhead" style="' + vstyle(v) + '">' + esc(v) + '</div>'; });
 
@@ -695,11 +703,28 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     return out;
   }
 
+  // 会場名の行の写しを、表の列幅と横スクロールに合わせる
+  function syncGridHead() {
+    const wrap = document.getElementById('gridWrap'), head = document.getElementById('gridHead');
+    if (!wrap || !head) return;
+    const bar = document.querySelector('.bar');
+    document.documentElement.style.setProperty('--barh', (bar ? bar.offsetHeight : 0) + 'px');
+    const inner = head.querySelector('.grid');
+    const widths = Array.prototype.map.call(wrap.querySelectorAll('.grid > .corner, .grid > .vhead'), el => el.getBoundingClientRect().width + 'px');
+    inner.style.gridTemplateColumns = widths.join(' ');
+    const move = () => { inner.style.transform = 'translateX(' + (-wrap.scrollLeft) + 'px)'; };
+    if (!wrap.dataset.synced) { wrap.dataset.synced = '1'; wrap.addEventListener('scroll', move, { passive: true }); }
+    move();
+  }
+  // 画面の向きを変えたときや、フォントが後から読み込まれたときに列幅を合わせ直す
+  window.addEventListener('resize', syncGridHead);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncGridHead);
+
   function scrollGridToNow() {
     const wrap = document.getElementById('gridWrap');
     if (!wrap || state.day !== todayStr()) return;
     const line = wrap.querySelector('.nowline');
-    if (line) wrap.scrollTop = Math.max(line.offsetTop - 120, 0);
+    if (line) window.scrollTo(0, Math.max(line.getBoundingClientRect().top + window.scrollY - 200, 0));
   }
 
   function listHtml() {
