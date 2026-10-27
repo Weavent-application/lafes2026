@@ -807,9 +807,13 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   // タイトルは改行しない。入りきらなければ文字を小さくし、最小サイズでも入らなければ「…」
   function fitOneLine(el, minPx) {
     el.style.fontSize = '';
+    // 省略表示中は scrollWidth が当てにならないので、文字そのものの幅を測る
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const textW = () => range.getBoundingClientRect().width;
     let fs = parseFloat(getComputedStyle(el).fontSize);
-    for (let i = 0; i < 20 && el.scrollWidth > el.clientWidth && fs > minPx; i++) {
-      fs = Math.max(minPx, Math.min(fs - 0.5, fs * el.clientWidth / el.scrollWidth));
+    for (let i = 0; i < 20 && textW() > el.clientWidth && fs > minPx; i++) {
+      fs = Math.max(minPx, Math.min(fs - 0.5, fs * el.clientWidth / textW()));
       el.style.fontSize = fs + 'px';
     }
   }
