@@ -415,7 +415,6 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   const $app = document.getElementById('app');
   const $modal = document.getElementById('modal');
   const $sheet = document.getElementById('sheet');
-  const isNarrow = () => window.matchMedia('(max-width: 719px)').matches;
 
   // ---------- 小物 ----------
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -610,7 +609,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       const t = todayStr();
       state.day = (c.days.find(d => d.date === t) || c.days[0]).date;
     }
-    if (!state.mode) state.mode = isNarrow() ? 'list' : 'grid';
+    if (!state.mode) state.mode = 'grid';  // スマホも最初は表（リストはボタンで切り替え）
 
     const tabs = c.days.map(d => {
       // 事務局の基本枠（登録できない枠）も数に入れる
