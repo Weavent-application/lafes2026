@@ -260,6 +260,12 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; margin-bottom: 10px;
 }
 .scard .t { font-weight: 700; font-size: 15.5px; display: block; line-height: 1.45; }
+/* PCは一覧を2列で並べる（1列だと左右が空きすぎるため） */
+@media (min-width: 900px) {
+  .page.wide { max-width: 1080px; }
+  #results .group { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; }
+  #results .group h3 { grid-column: 1 / -1; }
+}
 .scard .s { color: var(--muted); font-size: 13px; display: block; }
 .scard .w { color: var(--forest); font-weight: 700; font-size: 13px; display: block; }
 .thumb { width: 116px; height: 74px; border-radius: 10px; overflow: hidden; background: var(--forest-soft); }
@@ -764,7 +770,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   // セッション一覧：この後開催されるものを、始まる順に
   function renderList() {
     $app.innerHTML =
-      '<div class="page">' +
+      '<div class="page wide">' +
         '<h2 class="ptitle">セッション一覧</h2>' +
         '<p class="hint">この後開催されるセッションはこちら！ タッチすると詳細が表示されます。</p>' +
         '<div class="filters">' +
@@ -781,7 +787,9 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   function renderResults() {
     const now = nowKey();
     const q = state.q.trim().toLowerCase();
-    const list = state.sessions.slice().sort(byTime)
+    // 事務局の基本枠（オープニングなど）も載せる。開場・受付のようなセッションでない枠（notSession）は除く
+    const fixed = state.config.fixed.filter(f => !f.notSession).map(f => Object.assign({ fixedIndex: state.config.fixed.indexOf(f) }, f));
+    const list = state.sessions.concat(fixed).sort(byTime)
       .filter(s => state.showPast || endKey(s) > now)
       .filter(s => !q || [s.title, s.host, venueName(s), s.description].join(' ').toLowerCase().indexOf(q) >= 0);
     const $r = document.getElementById('results');
@@ -791,10 +799,11 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     }
     const card = s => {
       const live = startKey(s) <= now && now < endKey(s);
-      return '<button type="button" class="scard" data-id="' + esc(s.id) + '" style="' + vstyle(s.venue) + '"><div>' +
-        '<span class="w">' + esc(dayLabel(s.date)) + ' ' + esc(s.start) + '–' + esc(s.end) + (live ? '<span class="tag now">開催中</span>' : '') + '</span>' +
+      const isFixed = s.fixedIndex !== undefined;
+      return '<button type="button" class="scard" ' + (isFixed ? 'data-fixed="' + s.fixedIndex + '"' : 'data-id="' + esc(s.id) + '"') + ' style="' + vstyle(s.venue) + '"><div>' +
+        '<span class="w">' + esc(dayLabel(s.date)) + ' ' + esc(s.start) + '–' + esc(s.end) + (isFixed ? '<span class="tag">全体</span>' : '') + (live ? '<span class="tag now">開催中</span>' : '') + '</span>' +
         '<span class="t">' + esc(s.title) + '</span>' +
-        '<span class="s">' + esc(s.host) + '・' + '<span class="nw">' + esc(venueName(s)) + '</span>' + '</span>' +
+        '<span class="s">' + [esc(s.host || ''), s.venue ? '<span class="nw">' + esc(venueName(s)) + '</span>' : ''].filter(Boolean).join('・') + '</span>' +
         '</div><div class="thumb">' + imgHtml(s) + '</div></button>';
     };
     const live = list.filter(s => startKey(s) <= now && now < endKey(s));
