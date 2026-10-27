@@ -290,7 +290,7 @@ dl.info { display: grid; grid-template-columns: 3.4em 1fr; gap: 6px 12px; margin
 dl.info dt { color: var(--muted); font-weight: 600; font-size: 13px; }
 dl.info dd { margin: 0; font-weight: 700; font-size: 17px; line-height: 1.5; }
 dl.info dd.when { color: var(--forest); font-size: 18px; }
-.sheet h2.dtitle { font-size: clamp(26px, 7vw, 32px); line-height: 1.35; margin: 2px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet h2.dtitle { font-size: clamp(26px, 7vw, 32px); line-height: 1.35; margin: 2px 0 6px; overflow-wrap: anywhere; }
 .dactions { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
 .dactions .btn.close { width: 100%; min-height: 56px; }
 /* 修正・削除は閉じるより一段下げて控えめに */
@@ -325,7 +325,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
 .summary { display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin: 12px 0; }
 .sumimg { width: 88px; height: 60px; border-radius: 10px; overflow: hidden; }
-.summary .t { font-weight: 700; display: block; line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.summary .t { font-weight: 700; display: block; line-height: 1.45; overflow-wrap: anywhere; }
 .summary > div { min-width: 0; }
 .summary .s { color: var(--muted); font-size: 13px; display: block; }
 .big-ok { font-size: 44px; line-height: 1; margin: 6px 0 4px; }
@@ -799,23 +799,6 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     hydrateImages($sheet);
     const f = $sheet.querySelector('h2');
     if (f) { f.setAttribute('tabindex', '-1'); f.focus({ preventScroll: true }); }
-    const fit = () => $sheet.querySelectorAll('.dtitle, .summary .t').forEach(el => fitOneLine(el, el.classList.contains('dtitle') ? 16 : 12));
-    fit();
-    // 文字（Webフォント）の読み込みが終わると幅が変わるので、測り直す
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
-  }
-  // タイトルは改行しない。入りきらなければ文字を小さくし、最小サイズでも入らなければ「…」
-  function fitOneLine(el, minPx) {
-    el.style.fontSize = '';
-    // 省略表示中は scrollWidth が当てにならないので、文字そのものの幅を測る
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    const textW = () => range.getBoundingClientRect().width;
-    let fs = parseFloat(getComputedStyle(el).fontSize);
-    for (let i = 0; i < 20 && textW() > el.clientWidth && fs > minPx; i++) {
-      fs = Math.max(minPx, Math.min(fs - 0.5, fs * el.clientWidth / textW()));
-      el.style.fontSize = fs + 'px';
-    }
   }
   function closeModal() {
     if ($modal.hidden) return;
