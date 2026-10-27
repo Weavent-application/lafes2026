@@ -860,13 +860,14 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     );
   }
 
-  function confirmDelete(id) {
+  // 削除は2回確認する（1回目: 内容の確認、2回目: 本当に削除するか）
+  function confirmDelete(id, final) {
     const s = state.sessions.find(x => x.id === id);
     if (!s) return;
     openModal(
-      '<h2>このセッションを削除しますか？</h2>' +
+      (final ? '<h2>本当に削除しますか？</h2>' : '<h2>このセッションを削除しますか？</h2>') +
       summaryHtml(s) +
-      '<p class="sub">削除すると、タイムテーブルと一覧から消えます。</p>' +
+      (final ? '<p class="sub">「削除する」を押すと、すぐにタイムテーブルと一覧から消えます。</p>' : '<p class="sub">削除すると、タイムテーブルと一覧から消えます。</p>') +
       '<div class="err" id="ferr" role="alert"></div>' +
       '<div class="stack">' +
         '<button class="btn danger solid big" type="button" id="delOk">削除する</button>' +
@@ -875,7 +876,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     );
     const btn = document.getElementById('delOk');
     btn.addEventListener('click', () => {
-      btn.disabled = true; btn.textContent = '削除しています…';
+      if (!final) return confirmDelete(id, true);
+      btn.disabled = true; btn.textContent = '削除中…';
       call('deleteSession', id)
         .then(() => reload()).then(() => {
           render();
