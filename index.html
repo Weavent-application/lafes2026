@@ -180,6 +180,8 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (max-width: 719px) {
   .tabs { flex: 1 1 100%; gap: 4px; }
   .tab { flex: 1 1 0; min-width: 0; padding: 0 4px; font-size: 13px; letter-spacing: -.02em; }
+  /* トップのメッセージは行間を詰める */
+  .hero .lead { line-height: 1.6; }
 }
 
 /* 縦はページごとスクロールし、表の中は横だけ動かす（スマホで表を触るとページが下へ進めず迷うため） */
@@ -265,6 +267,8 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 /* 主催・場所は1行で、長いときは「…」で省略する */
 .scard > div:first-child { min-width: 0; }
 .scard .s.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* スマホは主催・場所を小さめにして、1行に入る文字を増やす */
+@media (max-width: 719px) { .scard .s { font-size: 12px; } }
 .scard .w { color: var(--forest); font-weight: 700; font-size: 13px; display: block; }
 .thumb { width: 116px; height: 74px; border-radius: 10px; overflow: hidden; background: var(--forest-soft); }
 .thumb img, .dimg img, .sumimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
