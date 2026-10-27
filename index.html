@@ -608,7 +608,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     if (!state.mode) state.mode = isNarrow() ? 'list' : 'grid';
 
     const tabs = c.days.map(d => {
-      const count = state.sessions.filter(s => s.date === d.date).length;
+      // 事務局の基本枠（登録できない枠）も数に入れる
+      const count = state.sessions.filter(s => s.date === d.date).length + c.fixed.filter(f => f.date === d.date && !f.notSession).length;
       return '<button class="tab" role="tab" type="button" data-day="' + d.date + '" aria-selected="' + (d.date === state.day) + '">' + esc(d.label) + '（' + count + '）</button>';
     }).join('');
 
@@ -1158,7 +1159,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       ],
       venues: ['SKY FIELD', 'SKY ARC', 'GARAGE LODGE', 'MOONBEAR DECK', 'KIDS BASE', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'Main Street', 'Podcast Studio', 'その他'],
       fixed: [
-        { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付' },
+        { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付', notSession: true },
         {
           date: '2026-11-12', start: '13:00', end: '14:00', title: 'オープニングセッション',
           host: 'ラーフェス実行委員会', venue: 'SKY FIELD',
