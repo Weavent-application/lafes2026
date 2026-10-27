@@ -851,7 +851,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         '<dt>日時</dt><dd class="when">' + esc(dayLabel(f.date)) + ' ' + esc(f.start) + '〜' + esc(f.end) + '</dd>' +
         '<dt>場所</dt>' + (f.venue
           ? '<dd style="' + vstyle(f.venue) + '"><span style="white-space:nowrap"><span class="vdot" aria-hidden="true"></span>' + esc(venueName(f)) + '</span>　<button type="button" class="linkbtn" data-go="map">マップで見る</button></dd>'
-          : '<dd>全体</dd>') +
+          : '<dd>ー</dd>') +
         (f.host ? '<dt>主催</dt><dd>' + esc(f.host) + '</dd>' : '') +
       '</dl>' +
       (f.description ? '<div class="desc">' + esc(f.description) + '</div>' : '') +
@@ -1170,7 +1170,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
           host: '全日本芋煮会同好会アンディさん、藤田祐司さん、ラーフェス実行委員会', venue: 'SKY FIELD',
           description: '今年も魅力的な人がたくさん集まるラーフェス2026。心も身体もあたたまる「芋煮でつながっていいとも！」で、芋煮で出会ってつながって深めましょう。\n\nチームに入らなくなってしまうので、くれぐれも遅れずにご参加くださいね。',
         },
-        { date: '2026-11-14', start: '14:00', end: '15:00', title: 'クロージングセッション' },
+        { date: '2026-11-14', start: '14:00', end: '15:00', title: 'クロージングセッション', venue: 'SKY FIELD' },
       ],
       slotMinutes: 15,
       links: {
