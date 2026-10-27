@@ -190,7 +190,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .timecol { position: sticky; left: 0; z-index: 2; background: var(--surface); border-right: 1px solid var(--line); }
 .timecol div { height: var(--hour); font-size: 12px; color: var(--muted); text-align: right; padding: 0 6px; transform: translateY(-9px); }
 .timecol div:first-child { transform: none; }
-.grid .vhead { white-space: nowrap; }
+.grid .vhead, .nw { white-space: nowrap; }
 /* 列幅は基本 --col。会場名が長い列（MORINO HIROBA -MATSU など）だけ名前に合わせて広がる */
 .col { position: relative; border-right: 1px solid var(--line); min-width: var(--col);
   background-image: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px calc(var(--hour) / 2));
@@ -716,7 +716,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       } else {
         html += '<button type="button" class="item" data-id="' + esc(s.id) + '" style="' + vstyle(s.venue) + '"><div class="when">' + esc(s.start) + '<small>–' + esc(s.end) + '</small></div>' +
           '<div><span class="t">' + esc(s.title) + '</span>' +
-          '<span class="s">' + esc(venueName(s)) + '・' + esc(s.host) + '</span></div></button>';
+          '<span class="s">' + '<span class="nw">' + esc(venueName(s)) + '</span>' + '・' + esc(s.host) + '</span></div></button>';
       }
     });
     return html + '</div></div>';
@@ -755,7 +755,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       return '<button type="button" class="scard" data-id="' + esc(s.id) + '" style="' + vstyle(s.venue) + '"><div>' +
         '<span class="w">' + esc(dayLabel(s.date)) + ' ' + esc(s.start) + '–' + esc(s.end) + (live ? '<span class="tag now">開催中</span>' : '') + '</span>' +
         '<span class="t">' + esc(s.title) + '</span>' +
-        '<span class="s">' + esc(s.host) + '・' + esc(venueName(s)) + '</span>' +
+        '<span class="s">' + esc(s.host) + '・' + '<span class="nw">' + esc(venueName(s)) + '</span>' + '</span>' +
         '</div><div class="thumb">' + imgHtml(s) + '</div></button>';
     };
     const live = list.filter(s => startKey(s) <= now && now < endKey(s));
@@ -799,12 +799,19 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     hydrateImages($sheet);
     const f = $sheet.querySelector('h2');
     if (f) { f.setAttribute('tabindex', '-1'); f.focus({ preventScroll: true }); }
-    $sheet.querySelectorAll('.dtitle, .summary .t').forEach(el => fitOneLine(el, el.classList.contains('dtitle') ? 16 : 12));
+    const fit = () => $sheet.querySelectorAll('.dtitle, .summary .t').forEach(el => fitOneLine(el, el.classList.contains('dtitle') ? 16 : 12));
+    fit();
+    // 文字（Webフォント）の読み込みが終わると幅が変わるので、測り直す
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   }
   // タイトルは改行しない。入りきらなければ文字を小さくし、最小サイズでも入らなければ「…」
   function fitOneLine(el, minPx) {
+    el.style.fontSize = '';
     let fs = parseFloat(getComputedStyle(el).fontSize);
-    while (el.scrollWidth > el.clientWidth && fs > minPx) { fs -= 1; el.style.fontSize = fs + 'px'; }
+    for (let i = 0; i < 20 && el.scrollWidth > el.clientWidth && fs > minPx; i++) {
+      fs = Math.max(minPx, Math.min(fs - 0.5, fs * el.clientWidth / el.scrollWidth));
+      el.style.fontSize = fs + 'px';
+    }
   }
   function closeModal() {
     if ($modal.hidden) return;
@@ -816,7 +823,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     return '<div class="summary"><div class="sumimg">' + imgHtml(s) + '</div><div>' +
       '<span class="t">' + esc(s.title) + '</span>' +
       '<span class="s">' + esc(s.host) + '</span>' +
-      '<span class="s">' + esc(dayLabel(s.date)) + ' ' + esc(s.start) + '–' + esc(s.end) + '・' + esc(venueName(s)) + '</span>' +
+      '<span class="s">' + esc(dayLabel(s.date)) + ' ' + esc(s.start) + '–' + esc(s.end) + '・' + '<span class="nw">' + esc(venueName(s)) + '</span>' + '</span>' +
       '</div></div>';
   }
 
@@ -829,7 +836,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '<h2 class="dtitle">' + esc(s.title) + '</h2>' +
       '<dl class="info">' +
         '<dt>日時</dt><dd class="when">' + esc(dayLabel(s.date)) + ' ' + esc(s.start) + '〜' + esc(s.end) + '</dd>' +
-        '<dt>場所</dt><dd style="' + vstyle(s.venue) + '"><span class="vdot" aria-hidden="true"></span>' + esc(venueName(s)) + '　<button type="button" class="linkbtn" data-go="map">マップで見る</button></dd>' +
+        '<dt>場所</dt><dd style="' + vstyle(s.venue) + '"><span style="white-space:nowrap"><span class="vdot" aria-hidden="true"></span>' + esc(venueName(s)) + '</span>　<button type="button" class="linkbtn" data-go="map">マップで見る</button></dd>' +
         '<dt>主催</dt><dd>' + esc(s.host) + '</dd>' +
       '</dl>' +
       '<div class="desc">' + esc(s.description) + '</div>' +
