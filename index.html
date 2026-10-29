@@ -6,6 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>ラーフェス2026</title>
+<!-- ホーム画面に追加したときのアイコン（GitHub Pages の site/assets/。白地に10周年ロゴ） -->
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-title" content="ラーフェス2026">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
@@ -131,8 +136,11 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 900px) { .heroimg { max-height: 80vh; } .hero .lead { font-size: 17px; } .hero .meta { font-size: 17px; } }
 .sect { max-width: 920px; margin: 0 auto; padding: 8px 16px 0; }
 .sect h2 { font-size: 15px; color: var(--wood); margin: 12px 0 0; letter-spacing: .04em; }
-.tiles { max-width: 920px; margin: 0 auto; padding: 10px 16px 8px; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
-@media (min-width: 720px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tiles { max-width: 1200px; margin: 0 auto; padding: 10px 16px 8px; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+/* PCは4列×2行（上段＝アプリの中、下段＝外部リンク）。それ未満は2列×4行 */
+@media (min-width: 900px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } .tile .tt { font-size: 15px; } }
+/* 「セッション確認・登録方法」は広い画面では1行、狭いと2行に折る */
+@media (min-width: 1240px) { .tile .tl .ph { white-space: nowrap; } .tile .tl:has(.ph) { white-space: nowrap; } }
 .tile {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; text-decoration: none; color: var(--ink);
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 14px 12px; min-height: 108px;
@@ -152,6 +160,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 900px) { .hero { padding-bottom: 8px; } .tiles { padding-bottom: 20px; } }
 @media (min-width: 900px) { .tile .td { font-size: 12.5px; } .tile .td.nowrap { white-space: nowrap; } .tile .td.nowrap wbr { display: none; } }
 .notes { max-width: 920px; margin: 0 auto; padding: 8px 16px 40px; }
+.notes .ext-inline { width: 1em; height: 1em; vertical-align: -0.15em; }
 .notes p { font-size: 13px; color: var(--muted); margin: 6px 0; padding-left: 1em; text-indent: -1em; }
 /* メニューの説明: スマホは短い文（.sm）で2行まで、それより広い画面は元の文（.lg） */
 .tile .td .sm, .tt .sp-only { display: none; }
@@ -610,7 +619,9 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   }
 
   function renderTop() {
-    const c = state.config, L = c.links;
+    const c = state.config;
+    // howto・radio は Code.gs の CONFIG.links にもある。Apps Script 未反映でも出るよう既定値を持つ
+    const L = Object.assign({ howto: 'https://false-waterfall-52c.notion.site/2026-408d374796ea803db767f01e8f502c49', radio: 'https://open.spotify.com/show/5448pj7Nd0mZ1svm3MIgkQ' }, c.links);
     const first = c.days[0], last = c.days[c.days.length - 1];
     const tile = (inner, attrs) => '<button type="button" class="tile" ' + attrs + '>' + inner + '</button>';
     const link = (href, inner) => '<a class="tile" href="' + esc(href) + '" target="_blank" rel="noopener">' + inner + '</a>';
@@ -635,10 +646,14 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
           '<span class="td"><span class="lg">セッション一覧を<wbr>確認し、<wbr>参加したい<wbr>セッションを<wbr>探すことが<wbr>できます</span><span class="sm">一覧を確認し、<wbr>探すことができます</span></span>', 'data-go="list"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>', '場内マップ') +
           '<span class="td"><span class="lg">セッション会場や<wbr>食事の<wbr>場所を<wbr>確認できます</span><span class="sm">会場や食事の場所を<wbr>確認できます</span></span>', 'data-go="map"') +
+        link(L.howto, tt('<svg class="i" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>', '<span class="hide-sp"><span class="ph">セッション確認・</span><span class="ph">登録方法</span></span><span class="sp-only">登録方法</span>', true) +
+          '<span class="td"><span class="lg">このアプリで<wbr>セッションを<wbr>確認・登録する<wbr>方法です</span><span class="sm">アプリの<wbr>使い方です</span></span>') +
         link(L.guide, tt('<svg class="i" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-1 5"/></svg>', '<span class="ph hide-sp">ラーフェスの</span><span class="ph">歩き方</span>', true) +
-          '<span class="td nowrap"><span class="lg">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span><span class="sm">はじめての方は、<wbr>まずお読みください</span></span>') +
+          '<span class="td"><span class="lg">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span><span class="sm">はじめての方は、<wbr>まずお読みください</span></span>') +
         link(L.facebook, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>', '<span class="hide-sp">Facebookグループ</span><span class="sp-only">FBグループ</span>', true) +
           '<span class="td"><span class="lg">お知らせ・<wbr>参加者の交流・<wbr>告知はこちら</span><span class="sm">お知らせ・交流・<wbr>告知はこちら</span></span>') +
+        link(L.radio, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>', '<span class="hide-sp">ラーフェスラジオ</span><span class="sp-only">ラジオ</span>', true) +
+          '<span class="td"><span class="lg">ラーフェスの<wbr>ポッドキャスト<wbr>番組です<wbr>（Spotify）</span><span class="sm">ポッドキャスト<wbr>番組です</span></span>') +
         link(L.website, tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>', '公式サイト', true) +
           '<span class="td"><span class="lg">ラーフェス2026の<wbr>公式ページです</span><span class="sm">ラーフェス2026の<wbr>公式ページです</span></span>') +
       '</section>' +
@@ -646,7 +661,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '<section class="notes">' +
         '<p>・同じ時間に開催場所が被ってしまった場合は、お互いにスペースを調整して開催をお願いします</p>' +
         '<p>・セッションは、登録した人以外も修正・削除できます。ほかの人のセッションは、本人に頼まれたときだけ直してください</p>' +
-        '<p>・「ラーフェスの歩き方」「<span class="hide-sp">Facebookグループ</span><span class="sp-only">FBグループ</span>」「公式サイト」は新しいタブで開きます。このアプリに戻るときは、そのタブを閉じてください</p>' +
+        '<p>・右上に ' + ICON_EXT.replace('class="i"', 'class="i ext-inline"') + ' が付いたボタン（使い方・歩き方・Facebookグループ・ラジオ・公式サイト）は新しいタブで開きます。このアプリに戻るときは、そのタブを閉じてください</p>' +
         '<p>・このアプリはホーム画面に追加するとすぐ開けて便利です（iPhone：共有ボタン →「ホーム画面に追加」／Android：︙ →「ホーム画面に追加」）</p>' +
         '<p>・アプリについての確認・問い合わせは、ラーフェス実行委員会：西舘聖哉 までお願いします</p>' +
       '</section>';
@@ -1309,6 +1324,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       ],
       slotMinutes: 15,
       links: {
+        howto: 'https://false-waterfall-52c.notion.site/2026-408d374796ea803db767f01e8f502c49',
+        radio: 'https://open.spotify.com/show/5448pj7Nd0mZ1svm3MIgkQ',
         guide: 'https://false-waterfall-52c.notion.site/2025-290d374796ea80329b9cc34a654a1672',
         facebook: 'https://www.facebook.com/groups/493722541052332/',
         website: 'https://learning-fest.jp/',
