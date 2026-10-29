@@ -79,6 +79,14 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .bar nav .nl[aria-current="page"] { color: var(--forest); background: var(--forest-soft); }
 .bar nav .nl { display: inline-flex; align-items: center; gap: 4px; }
 .bar nav .nl svg.i { width: 18px; height: 18px; }
+/* PC（マウスのある端末）だけ: メニューの文字は当てると緑＋下線、「セッション登録」は緑に変わり少し浮く */
+@media (hover: hover) and (pointer: fine) {
+  .bar nav .nl { cursor: pointer; text-decoration: underline 2px transparent; text-underline-offset: 6px; transition: color .15s ease, text-decoration-color .15s ease; }
+  .bar nav .nl:hover { color: var(--forest); text-decoration-color: currentColor; }
+  .bar nav .btn.accent { transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease; }
+  .bar nav .btn.accent:hover { background: var(--forest); border-color: var(--forest); color: var(--bg); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(35, 48, 42, .18); }
+}
+@media (prefers-reduced-motion: reduce) { .bar nav .nl, .bar nav .btn.accent { transition: none; } .bar nav .btn.accent:hover { transform: none; } }
 
 /* スマホ下のタブ */
 .tabbar {
@@ -126,14 +134,14 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .hero {
   max-width: 920px; margin: 0 auto; padding: 36px 16px 4px; text-align: center;
 }
-.hero .eyebrow { color: var(--wood); font-weight: 700; letter-spacing: .08em; font-size: clamp(20px, 6vw, 38px); line-height: 1.4; }
+.hero .eyebrow { color: var(--wood); font-weight: 700; letter-spacing: .08em; font-size: clamp(22px, 6.2vw, 42px); line-height: 1.4; }
 .hero h1 { font-size: clamp(28px, 6vw, 44px); line-height: 1.3; margin: 8px 0 12px; color: var(--forest); }
-.hero .lead { color: var(--muted); margin: 10px auto 20px; max-width: 40em; line-height: 1.9; }
-.hero .lead .ph, .tt .ph { display: inline-block; }
+.hero .lead { color: var(--muted); margin: 10px auto 20px; max-width: 40em; line-height: 1.9; font-size: 16.5px; }
+.hero .lead .ph, .hero .eyebrow .ph, .tt .ph { display: inline-block; }
 .tt .ph { white-space: nowrap; }
-.hero .meta { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 8px .3em; margin-bottom: 4px; font-weight: 600; font-size: 14px; }
+.hero .meta { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 8px .3em; margin-bottom: 4px; font-weight: 600; font-size: 15.5px; }
 /* PCでは写真を縦にも大きく出し、文字も少し大きくする（スマホは横幅で決まるので変わらない） */
-@media (min-width: 900px) { .heroimg { max-height: 80vh; } .hero .lead { font-size: 17px; } .hero .meta { font-size: 17px; } }
+@media (min-width: 900px) { .heroimg { max-height: 80vh; } .hero .lead { font-size: 19px; } .hero .meta { font-size: 19px; } }
 .sect { max-width: 920px; margin: 0 auto; padding: 8px 16px 0; }
 .sect h2 { font-size: 15px; color: var(--wood); margin: 12px 0 0; letter-spacing: .04em; }
 .tiles { max-width: 920px; margin: 0 auto; padding: 10px 16px 8px; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
@@ -643,7 +651,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     $app.innerHTML =
       '<div class="heroimg"><img id="heroImg" alt="軽井沢ラーニングフェスティバルの風景"><img id="heroLogo" class="logo" alt="KARUIZAWA LEARNING FEST. 10TH"></div>' +
       '<section class="hero">' +
-        '<div class="eyebrow">うちなる衝動 いのちのおと</div>' +
+        '<div class="eyebrow"><span class="ph">うちなる衝動</span> <span class="ph">いのちのおと</span></div>' +
         '<p class="lead">' +
           // 狭い画面でも言葉の途中で折り返さないよう、まとまりごとに区切る
           '<span class="ph">ラーフェスは、</span><span class="ph">みんなでつくる「場」です。</span><br>' +
