@@ -156,6 +156,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 /* メニューの説明: スマホは短い文（.sm）で2行まで、それより広い画面は元の文（.lg） */
 .tile .td .sm, .tt .sp-only { display: none; }
 @media (max-width: 599px) { .tt .hide-sp { display: none; } .tt .sp-only { display: inline; } .tile .td .lg { display: none; } .tile .td .sm { display: inline; } .tile .td { -webkit-line-clamp: 2; } }
+/* タイル以外の文中でもPC／スマホで言い方を変える（例: Facebookグループ／FBグループ） */
+.sp-only { display: none; }
+@media (max-width: 599px) { .hide-sp { display: none; } .sp-only { display: inline; } }
 /* スマホではメニューの説明とお願いの文字を少し小さく */
 @media (max-width: 599px) { .tile .td { font-size: 12px; } .notes p { font-size: 12px; } }
 @media (max-width: 380px) { .tile .td { font-size: 11.5px; } }
@@ -634,7 +637,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
           '<span class="td"><span class="lg">セッション会場や<wbr>食事の<wbr>場所を<wbr>確認できます</span><span class="sm">会場や食事の場所を<wbr>確認できます</span></span>', 'data-go="map"') +
         link(L.guide, tt('<svg class="i" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-1 5"/></svg>', '<span class="ph hide-sp">ラーフェスの</span><span class="ph">歩き方</span>', true) +
           '<span class="td nowrap"><span class="lg">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span><span class="sm">はじめての方は、<wbr>まずお読みください</span></span>') +
-        link(L.facebook, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>', 'FBグループ', true) +
+        link(L.facebook, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>', '<span class="hide-sp">Facebookグループ</span><span class="sp-only">FBグループ</span>', true) +
           '<span class="td"><span class="lg">お知らせ・<wbr>参加者の交流・<wbr>告知はこちら</span><span class="sm">お知らせ・交流・<wbr>告知はこちら</span></span>') +
         link(L.website, tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>', '公式サイト', true) +
           '<span class="td"><span class="lg">ラーフェス2026の<wbr>公式ページです</span><span class="sm">ラーフェス2026の<wbr>公式ページです</span></span>') +
@@ -643,7 +646,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '<section class="notes">' +
         '<p>・同じ時間に開催場所が被ってしまった場合は、お互いにスペースを調整して開催をお願いします</p>' +
         '<p>・セッションは、登録した人以外も修正・削除できます。ほかの人のセッションは、本人に頼まれたときだけ直してください</p>' +
-        '<p>・「ラーフェスの歩き方」「FBグループ」「公式サイト」は新しいタブで開きます。このアプリに戻るときは、そのタブを閉じてください</p>' +
+        '<p>・「ラーフェスの歩き方」「<span class="hide-sp">Facebookグループ</span><span class="sp-only">FBグループ</span>」「公式サイト」は新しいタブで開きます。このアプリに戻るときは、そのタブを閉じてください</p>' +
         '<p>・このアプリはホーム画面に追加するとすぐ開けて便利です（iPhone：共有ボタン →「ホーム画面に追加」／Android：︙ →「ホーム画面に追加」）</p>' +
         '<p>・アプリについての確認・問い合わせは、ラーフェス実行委員会：西舘聖哉 までお願いします</p>' +
       '</section>';
@@ -901,7 +904,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         '<dt>主催</dt><dd>' + esc(s.host) + '</dd>' +
       '</dl>' +
       '<div class="desc">' + esc(s.description) + '</div>' +
-      '<p class="note">このセッションのURLを <button type="button" class="linkbtn" data-share="' + esc(s.id) + '">コピー</button> して、FBグループで告知できます。</p>' +
+      '<p class="note">このセッションのURLを <button type="button" class="linkbtn" data-share="' + esc(s.id) + '">コピー</button> して、<span class="hide-sp">Facebookグループ</span><span class="sp-only">FBグループ</span>で告知できます。</p>' +
       '<div class="dactions">' +
         '<button class="btn close" type="button" data-close>閉じる</button>' +
         '<div class="sub2">' +
