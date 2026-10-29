@@ -278,7 +278,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 /* マップ */
 .zoombar { display: flex; gap: 8px; align-items: center; margin: 6px 0 10px; }
 /* 指で操作する端末（スマホ・タブレット）はピンチで拡大するので、ボタンは出さない */
-@media (hover: none) and (pointer: coarse) { .zoombar { display: none; } }
+/* 逆に「2本指で広げると拡大」の説明は、指で操作する端末だけに出す */
+.touchonly { display: none; }
+@media (hover: none) and (pointer: coarse) { .zoombar { display: none; } .touchonly { display: inline; } }
 .mapwrap { overflow: auto; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-height: calc(100vh - 200px - var(--tabbar)); }
 .mapwrap img { display: block; width: 100%; height: auto; }
 /* 会場名の上に重ねる押せる枠。マップ画像に対する%で置くので、拡大しても位置がずれない */
@@ -297,6 +299,19 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   border-radius: 20px 20px 0 0; padding: 20px 18px calc(20px + env(safe-area-inset-bottom)); box-shadow: var(--shadow);
 }
 @media (min-width: 720px) { .modal { align-items: center; } .sheet { border-radius: 20px; padding: 24px 26px; } }
+/* 詳細画面の右上の×。高さ0の帯（.xbar）を上に貼りつけ、その中に置く。下へスクロールしても右上に残り、画像の位置もずらさない */
+.xbar { position: sticky; top: 0; z-index: 2; height: 0; }
+/* 白い丸はやめ、半透明の暗い丸＋白い×。写真の上でも本文（白地）の上でも見える。押せる範囲は見た目より広く（::before） */
+.xclose {
+  position: absolute; top: -6px; right: -4px; display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0;
+  border: 0; border-radius: 50%; background: rgba(20, 28, 24, .42); color: #fff;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); cursor: pointer;
+}
+.xclose::before { content: ""; position: absolute; inset: -8px; }
+.xclose:hover, .xclose:focus-visible { background: rgba(20, 28, 24, .6); outline: none; }
+.xclose svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.6; fill: none; stroke-linecap: round; }
+@media (min-width: 720px) { .xclose { top: -10px; right: -12px; } }
 .sheet h2 { margin: 0 0 4px; font-size: 21px; color: var(--forest); line-height: 1.4; }
 .sheet .sub { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
 .sheet .desc { white-space: pre-wrap; margin: 18px 0 14px; overflow-wrap: anywhere; font-size: 16px; line-height: 1.9; color: var(--ink); font-weight: 500; }
@@ -835,7 +850,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     $app.innerHTML =
       '<div class="page">' +
         '<h2 class="ptitle">場内マップ</h2>' +
-        '<p class="hint">ライジングフィールド内のマップです。セッション会場やランチ・ディナーの場所など、場所を知りたいときに使ってください。<br>スマホは2本指で広げると拡大できます。白い枠の会場名を押すと、その会場のセッションが見られます。</p>' +
+        '<p class="hint">ライジングフィールド内のマップです。<br>白い枠の会場名を押すと、その会場のセッションが見られます。<span class="touchonly"><br>2本指で広げると拡大できます。</span></p>' +
         '<div class="zoombar">' +
           '<button class="btn small" type="button" data-zoom="-1" aria-label="小さく">－ 小さく</button>' +
           '<button class="btn small" type="button" data-zoom="1" aria-label="大きく">＋ 大きく</button>' +
@@ -869,11 +884,15 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '</div></div>';
   }
 
+  // 詳細画面の右上に置く×（下の「閉じる」と同じ動き）
+  const XCLOSE = '<div class="xbar"><button type="button" class="xclose" data-close aria-label="閉じる"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+
   // セッション詳細：修正・削除はここから誰でもできる
   function showDetail(id) {
     const s = state.sessions.find(x => x.id === id);
     if (!s) { toast('このセッションは見つかりませんでした'); return; }
     openModal(
+      XCLOSE +
       '<div class="dimg">' + imgHtml(s) + '</div>' +
       '<h2 class="dtitle">' + esc(s.title) + '</h2>' +
       '<dl class="info">' +
@@ -898,6 +917,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     const f = state.config.fixed[i];
     if (!f) return;
     openModal(
+      XCLOSE +
       (f.imageId || f.imageFile ? '<div class="dimg">' + imgHtml(f) + '</div>' : '') +
       '<h2 class="dtitle">' + esc(f.title) + '</h2>' +
       '<dl class="info">' +
