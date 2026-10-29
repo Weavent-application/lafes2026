@@ -277,7 +277,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 
 /* マップ */
 .zoombar { display: flex; gap: 8px; align-items: center; margin: 6px 0 10px; }
-.mapwrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-height: calc(100vh - 200px - var(--tabbar)); }
+/* 指で操作する端末（スマホ・タブレット）はピンチで拡大するので、ボタンは出さない */
+@media (hover: none) and (pointer: coarse) { .zoombar { display: none; } }
+.mapwrap { overflow: auto; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-height: calc(100vh - 200px - var(--tabbar)); }
 .mapwrap img { display: block; width: 100%; height: auto; }
 /* 会場名の上に重ねる押せる枠。マップ画像に対する%で置くので、拡大しても位置がずれない */
 .mapinner { position: relative; }
@@ -833,7 +835,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     $app.innerHTML =
       '<div class="page">' +
         '<h2 class="ptitle">場内マップ</h2>' +
-        '<p class="hint">ライジングフィールド内のマップです。セッション会場やランチ・ディナーの場所など、場所を知りたいときに使ってください。<br>白い枠の会場名を押すと、その会場のセッションが見られます。</p>' +
+        '<p class="hint">ライジングフィールド内のマップです。セッション会場やランチ・ディナーの場所など、場所を知りたいときに使ってください。<br>スマホは2本指で広げると拡大できます。白い枠の会場名を押すと、その会場のセッションが見られます。</p>' +
         '<div class="zoombar">' +
           '<button class="btn small" type="button" data-zoom="-1" aria-label="小さく">－ 小さく</button>' +
           '<button class="btn small" type="button" data-zoom="1" aria-label="大きく">＋ 大きく</button>' +
@@ -1135,11 +1137,53 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     return call('getSessions').then(list => { state.sessions = fixVenues(list); });
   }
 
+  // ---------- マップの拡大縮小（2本指のピンチ・PCは Ctrl＋ホイール／トラックパッド） ----------
+  // 1本指の移動はブラウザのスクロールに任せる。ページ全体の拡大は .mapwrap の touch-action で止めている
+  const ZOOM_MIN = 1, ZOOM_MAX = 4;
+  let pinch = null, pinchEnd = 0;
+  // 指の位置（cx, cy）の下にある地点が動かないように拡大する
+  function setZoom(wrap, z, cx, cy) {
+    const inner = wrap.querySelector('.mapinner');
+    if (!inner) return;
+    z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
+    const r = wrap.getBoundingClientRect();
+    const ox = cx - r.left, oy = cy - r.top;
+    const k = z / state.zoom;
+    const px = (wrap.scrollLeft + ox) * k, py = (wrap.scrollTop + oy) * k;
+    state.zoom = z;
+    document.querySelectorAll('.mapinner').forEach(m => { m.style.width = (z * 100) + '%'; });
+    wrap.scrollLeft = px - ox;
+    wrap.scrollTop = py - oy;
+  }
+  const touchDist = ts => Math.hypot(ts[0].clientX - ts[1].clientX, ts[0].clientY - ts[1].clientY);
+  document.addEventListener('touchstart', e => {
+    const wrap = e.target.closest && e.target.closest('.mapwrap');
+    if (wrap && e.touches.length === 2) pinch = { wrap: wrap, d0: touchDist(e.touches), z0: state.zoom };
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (!pinch || e.touches.length !== 2) return;
+    e.preventDefault();
+    const ts = e.touches;
+    setZoom(pinch.wrap, pinch.z0 * touchDist(ts) / pinch.d0, (ts[0].clientX + ts[1].clientX) / 2, (ts[0].clientY + ts[1].clientY) / 2);
+  }, { passive: false });
+  document.addEventListener('touchend', e => {
+    if (pinch && e.touches.length < 2) { pinch = null; pinchEnd = Date.now(); }
+  });
+  // iPhone の Safari はピンチでページごと拡大しようとするので止める
+  document.addEventListener('gesturestart', e => { if (e.target.closest && e.target.closest('.mapwrap')) e.preventDefault(); });
+  document.addEventListener('wheel', e => {
+    const wrap = e.ctrlKey && e.target.closest && e.target.closest('.mapwrap');
+    if (!wrap) return;
+    e.preventDefault();
+    setZoom(wrap, state.zoom * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+  }, { passive: false });
+
   // ---------- 操作 ----------
   document.addEventListener('click', ev => {
     const t = ev.target.closest('[data-go],[data-new],[data-day],[data-id],[data-close],[data-edit],[data-del],[data-share],[data-zoom],[data-fixed],[data-mapvenue],.col');
     if (!t) { if (ev.target === $modal) closeModal(); return; }
     if (t.hasAttribute('data-mapvenue')) {
+      if (Date.now() - pinchEnd < 400) return; // ピンチの指を離したときの誤タップは無視
       const v = t.getAttribute('data-mapvenue');
       const box = t.closest('#formMap');
       if (box) {
@@ -1166,8 +1210,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     if (t.hasAttribute('data-del')) return confirmDelete(t.getAttribute('data-del'));
     if (t.hasAttribute('data-share')) return copyText(state.baseUrl + '?s=' + encodeURIComponent(t.getAttribute('data-share')));
     if (t.hasAttribute('data-zoom')) {
-      state.zoom = Math.max(1, Math.min(3, state.zoom + Number(t.getAttribute('data-zoom')) * 0.5));
-      document.querySelectorAll('.mapinner').forEach(m => { m.style.width = (state.zoom * 100) + '%'; });
+      const wrap = document.querySelector('.page .mapwrap');
+      if (wrap) { const r = wrap.getBoundingClientRect(); setZoom(wrap, state.zoom + Number(t.getAttribute('data-zoom')) * 0.5, r.left + r.width / 2, r.top + r.height / 2); }
       return;
     }
     if (t.classList.contains('col')) {
