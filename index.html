@@ -469,7 +469,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   const venueName = s => s.venue === 'その他' ? (s.venueOther || 'その他') : s.venue;
   // 場所ごとの色。マップの雰囲気に寄せた色相。「その他」はグレー
   const VENUE_HUES = {
-    'SKY FIELD': 135, 'SKY ARC': 205, 'PODCAST STUDIO': 300, 'MOON BEAR': 265,
+    'SKY FIELD': 135, 'SKY ARC': 205, 'PODCAST STUDIO': 300, 'GARAGE LODGE': 35, 'MOON BEAR': 265,
     'TAKIBI BASE': 5, 'SAUNA RIVER': 180, 'MORINO HIROBA -MOMI': 70, 'MORINO HIROBA -MATSU': 110,
   };
   // 2025年の会場名で登録された行の読み替え。2026年のマップに無い会場は「その他」＋元の名前にする
@@ -834,6 +834,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     'SKY FIELD': [27.7, 62.2, 9.1, 6.8],
     'SKY ARC': [33.0, 42.4, 7.9, 6.0],
     'PODCAST STUDIO': [33.0, 53.2, 7.9, 6.2],
+    'GARAGE LODGE': [48.0, 36.4, 9.4, 6.7],
     'MOON BEAR': [60.9, 36.1, 9.0, 7.1],
     'TAKIBI BASE': [67.5, 14.7, 7.5, 7.1],
     'SAUNA RIVER': [5.6, 18.0, 7.5, 7.2],
@@ -846,7 +847,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       const p = MAP_SPOTS[v];
       return '<button type="button" class="maphot" data-mapvenue="' + esc(v) + '" style="left:' + p[0] + '%;top:' + p[1] + '%;width:' + p[2] + '%;height:' + p[3] + '%" aria-label="' + esc(v) + (inForm ? 'を開催場所にする' : 'のセッションを見る') + '"></button>';
     }).join('');
-    return '<div class="mapwrap"><div class="mapinner" style="width:' + (state.zoom * 100) + '%"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、PODCAST STUDIO、MOON BEAR、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA -MOMI・-MATSU の位置">' + spots + '</div></div>';
+    return '<div class="mapwrap"><div class="mapinner" style="width:' + (state.zoom * 100) + '%"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、PODCAST STUDIO、GARAGE LODGE、MOON BEAR、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA -MOMI・-MATSU の位置">' + spots + '</div></div>';
   }
 
   function renderMap() {
@@ -1285,7 +1286,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         { date: '2026-11-13', label: '11/13(金)', start: '07:00', end: '23:00' },
         { date: '2026-11-14', label: '11/14(土)', start: '07:00', end: '15:00' },
       ],
-      venues: ['SKY FIELD', 'SKY ARC', 'MOON BEAR', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'PODCAST STUDIO', 'その他'],
+      venues: ['SKY FIELD', 'SKY ARC', 'GARAGE LODGE', 'MOON BEAR', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'PODCAST STUDIO', 'その他'],
       fixed: [
         { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付', notSession: true },
         {
