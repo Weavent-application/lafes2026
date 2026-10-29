@@ -486,7 +486,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
   // ---------- 画像 ----------
   // トップ画像・マップ。手元では assets/ のファイル、Apps Script では getAsset で受け取る
-  const ASSET_VER = '20261027';
+  const ASSET_VER = '20261029';
   const assetCache = {};
   function assetUrl(name) {
     // 画像を差し替えたら ASSET_VER を変える（ブラウザに古い画像が残らないように）
@@ -800,7 +800,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   }
 
   function mapHtml() {
-    return '<div class="mapwrap"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、GARAGE LODGE、MOONBEAR DECK、KIDS BASE、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA、Main Street の位置" style="width:' + (state.zoom * 100) + '%"></div>';
+    return '<div class="mapwrap"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、PODCAST STUDIO、RIDGE LODGE、GARAGE LODGE、CENTER FIELD、MOON BEAR、CENTER HOUSE、KIDS CAMP、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA -MOMI・-MATSU、Main Street の位置" style="width:' + (state.zoom * 100) + '%"></div>';
   }
 
   function renderMap() {
