@@ -279,6 +279,10 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .zoombar { display: flex; gap: 8px; align-items: center; margin: 6px 0 10px; }
 .mapwrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); max-height: calc(100vh - 200px - var(--tabbar)); }
 .mapwrap img { display: block; width: 100%; height: auto; }
+/* 会場名の上に重ねる押せる枠。マップ画像に対する%で置くので、拡大しても位置がずれない */
+.mapinner { position: relative; }
+.maphot { position: absolute; padding: 0; border: 2px solid rgba(255,255,255,.7); border-radius: 8px; background: transparent; cursor: pointer; box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
+.maphot:hover, .maphot:focus-visible { background: rgba(255,255,255,.25); border-color: #fff; outline: none; }
 .mapbox { margin-top: 6px; }
 .mapbox summary { cursor: pointer; color: var(--forest); font-weight: 600; font-size: 14px; }
 .mapbox .mapwrap { max-height: 50vh; margin-top: 6px; }
@@ -445,11 +449,11 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   const venueName = s => s.venue === 'その他' ? (s.venueOther || 'その他') : s.venue;
   // 場所ごとの色。マップの雰囲気に寄せた色相。「その他」はグレー
   const VENUE_HUES = {
-    'SKY FIELD': 135, 'SKY ARC': 205, 'PODCAST STUDIO': 300, 'MOON BEAR': 265, 'KIDS CAMP': 330,
+    'SKY FIELD': 135, 'SKY ARC': 205, 'PODCAST STUDIO': 300, 'MOON BEAR': 265,
     'TAKIBI BASE': 5, 'SAUNA RIVER': 180, 'MORINO HIROBA -MOMI': 70, 'MORINO HIROBA -MATSU': 110,
   };
   // 2025年の会場名で登録された行の読み替え。2026年のマップに無い会場は「その他」＋元の名前にする
-  const VENUE_RENAME = { 'MOONBEAR DECK': 'MOON BEAR', 'KIDS BASE': 'KIDS CAMP', 'Podcast Studio': 'PODCAST STUDIO' };
+  const VENUE_RENAME = { 'MOONBEAR DECK': 'MOON BEAR', 'Podcast Studio': 'PODCAST STUDIO' };
   const fixVenues = list => list.map(s => {
     if (!s.venue || s.venue === 'その他' || state.config.venues.indexOf(s.venue) >= 0) return s;
     if (VENUE_RENAME[s.venue]) return Object.assign({}, s, { venue: VENUE_RENAME[s.venue] });
@@ -805,15 +809,31 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     hydrateImages($r);
   }
 
-  function mapHtml() {
-    return '<div class="mapwrap"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、PODCAST STUDIO、MOON BEAR、KIDS CAMP、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA -MOMI・-MATSU の位置" style="width:' + (state.zoom * 100) + '%"></div>';
+  // マップ上の会場名の位置（2026年マップ 2000×1414px に対する%：左・上・幅・高さ）。マップを差し替えたら測り直す
+  const MAP_SPOTS = {
+    'SKY FIELD': [27.7, 62.2, 9.1, 6.8],
+    'SKY ARC': [33.0, 42.4, 7.9, 6.0],
+    'PODCAST STUDIO': [33.0, 53.2, 7.9, 6.2],
+    'MOON BEAR': [60.9, 36.1, 9.0, 7.1],
+    'TAKIBI BASE': [67.5, 14.7, 7.5, 7.1],
+    'SAUNA RIVER': [5.6, 18.0, 7.5, 7.2],
+    'MORINO HIROBA -MOMI': [55.0, 2.5, 6.9, 8.6],
+    'MORINO HIROBA -MATSU': [75.2, 2.8, 6.9, 8.3],
+  };
+  // inForm: 登録フォームの中のマップ。押すと「開催場所」をその会場にする（地図の画面では、その会場のセッション一覧へ）
+  function mapHtml(inForm) {
+    const spots = Object.keys(MAP_SPOTS).filter(v => state.config.venues.indexOf(v) >= 0).map(v => {
+      const p = MAP_SPOTS[v];
+      return '<button type="button" class="maphot" data-mapvenue="' + esc(v) + '" style="left:' + p[0] + '%;top:' + p[1] + '%;width:' + p[2] + '%;height:' + p[3] + '%" aria-label="' + esc(v) + (inForm ? 'を開催場所にする' : 'のセッションを見る') + '"></button>';
+    }).join('');
+    return '<div class="mapwrap"><div class="mapinner" style="width:' + (state.zoom * 100) + '%"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、PODCAST STUDIO、MOON BEAR、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA -MOMI・-MATSU の位置">' + spots + '</div></div>';
   }
 
   function renderMap() {
     $app.innerHTML =
       '<div class="page">' +
         '<h2 class="ptitle">場内マップ</h2>' +
-        '<p class="hint">ライジングフィールド内のマップです。セッション会場やランチ・ディナーの場所など、場所を知りたいときに使ってください。</p>' +
+        '<p class="hint">ライジングフィールド内のマップです。セッション会場やランチ・ディナーの場所など、場所を知りたいときに使ってください。<br>白い枠の会場名を押すと、その会場のセッションが見られます。</p>' +
         '<div class="zoombar">' +
           '<button class="btn small" type="button" data-zoom="-1" aria-label="小さく">－ 小さく</button>' +
           '<button class="btn small" type="button" data-zoom="1" aria-label="大きく">＋ 大きく</button>' +
@@ -988,7 +1008,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         '<label class="f">セッション名<span class="req">必須</span><input type="text" name="title" maxlength="80" value="' + esc(s.title) + '" placeholder="例：焚き火を囲んで、問いを持ち寄る"></label>' +
         '<label class="f">お名前<span class="req">必須</span><input type="text" name="host" maxlength="60" value="' + esc(s.host) + '" autocomplete="name" placeholder="例：軽井沢 花子"></label>' +
         '<label class="f">開催場所<span class="req">必須</span><select name="venue"><option value="">選んでください</option>' + c.venues.map(v => '<option' + (v === s.venue ? ' selected' : '') + '>' + esc(v) + '</option>').join('') + '</select></label>' +
-        '<details class="mapbox" id="formMap"><summary>場所はマップで確認できます（ここを押すと開きます）</summary>' + mapHtml() + '</details>' +
+        '<details class="mapbox" id="formMap"><summary>場所はマップで確認できます（ここを押すと開きます。会場名を押すとその場所を選べます）</summary>' + mapHtml(true) + '</details>' +
         '<label class="f" id="otherWrap"' + (s.venue === 'その他' ? '' : ' hidden') + '>場所（その他）<span class="req">必須</span><input type="text" name="venueOther" maxlength="40" value="' + esc(s.venueOther) + '" placeholder="例：受付前の芝生"></label>' +
         '<label class="f">セッション内容<span class="req">必須</span><textarea name="description" maxlength="1000" placeholder="やること、持ち物、どんな人に来てほしいか など">' + esc(s.description) + '</textarea></label>' +
         '<label class="f">日にち<span class="req">必須</span><select name="date">' + c.days.map(d => '<option value="' + d.date + '"' + (d.date === s.date ? ' selected' : '') + '>' + esc(d.label) + '</option>').join('') + '</select></label>' +
@@ -1117,8 +1137,21 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
   // ---------- 操作 ----------
   document.addEventListener('click', ev => {
-    const t = ev.target.closest('[data-go],[data-new],[data-day],[data-id],[data-close],[data-edit],[data-del],[data-share],[data-zoom],[data-fixed],.col');
+    const t = ev.target.closest('[data-go],[data-new],[data-day],[data-id],[data-close],[data-edit],[data-del],[data-share],[data-zoom],[data-fixed],[data-mapvenue],.col');
     if (!t) { if (ev.target === $modal) closeModal(); return; }
+    if (t.hasAttribute('data-mapvenue')) {
+      const v = t.getAttribute('data-mapvenue');
+      const box = t.closest('#formMap');
+      if (box) {
+        // 登録フォームの中: 開催場所を選んでマップを閉じる
+        const sel = box.parentNode.querySelector('select[name="venue"]');
+        if (sel) { sel.value = v; sel.dispatchEvent(new Event('change', { bubbles: true })); sel.focus(); }
+        box.open = false;
+        return;
+      }
+      state.venue = v;
+      return go('list');
+    }
     if (t.hasAttribute('data-close')) return closeModal();
     if (t.hasAttribute('data-go')) return go(t.getAttribute('data-go'));
     if (t.hasAttribute('data-new')) return showForm();
@@ -1134,8 +1167,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     if (t.hasAttribute('data-share')) return copyText(state.baseUrl + '?s=' + encodeURIComponent(t.getAttribute('data-share')));
     if (t.hasAttribute('data-zoom')) {
       state.zoom = Math.max(1, Math.min(3, state.zoom + Number(t.getAttribute('data-zoom')) * 0.5));
-      const m = document.getElementById('mapImg');
-      if (m) m.style.width = (state.zoom * 100) + '%';
+      document.querySelectorAll('.mapinner').forEach(m => { m.style.width = (state.zoom * 100) + '%'; });
       return;
     }
     if (t.classList.contains('col')) {
@@ -1186,7 +1218,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         { date: '2026-11-13', label: '11/13(金)', start: '07:00', end: '23:00' },
         { date: '2026-11-14', label: '11/14(土)', start: '07:00', end: '15:00' },
       ],
-      venues: ['SKY FIELD', 'SKY ARC', 'MOON BEAR', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'KIDS CAMP', 'PODCAST STUDIO', 'その他'],
+      venues: ['SKY FIELD', 'SKY ARC', 'MOON BEAR', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'PODCAST STUDIO', 'その他'],
       fixed: [
         { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付', notSession: true },
         {
@@ -1214,12 +1246,12 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         website: 'https://learning-fest.jp/',
       },
     };
-    const KEY = 'larfes-mock-v5';
+    const KEY = 'larfes-mock-v6';
     const T = '2026-10-16 18:00:00';
     const seed = [
       { id: 'S1', title: '焚き火を囲んで、問いを持ち寄る', host: 'サンプル主催A', date: '2026-11-12', start: '19:00', end: '20:30', venue: 'TAKIBI BASE', venueOther: '', description: '今年いちばん考えたことを1つ持ってきてください。', imageId: 'sample1', updatedAt: T },
       { id: 'S2', title: '朝の森を歩く', host: 'サンプル主催B', date: '2026-11-13', start: '07:00', end: '08:00', venue: 'MORINO HIROBA -MOMI', venueOther: '', description: '朝ごはん前に、森をゆっくり歩きます。歩きやすい靴で。', imageId: 'sample2', updatedAt: T },
-      { id: 'S3', title: '子どもと作る、ダンボール秘密基地', host: 'サンプル主催C', date: '2026-11-13', start: '10:00', end: '12:00', venue: 'KIDS CAMP', venueOther: '', description: 'ダンボールとガムテープで、大人も子どもも本気で作ります。', imageId: '', updatedAt: T },
+      { id: 'S3', title: '子どもと作る、ダンボール秘密基地', host: 'サンプル主催C', date: '2026-11-13', start: '10:00', end: '12:00', venue: 'その他', venueOther: 'KIDS CAMP', description: 'ダンボールとガムテープで、大人も子どもも本気で作ります。', imageId: '', updatedAt: T },
       { id: 'S4', title: 'サウナと対話', host: 'サンプル主催D', date: '2026-11-13', start: '10:30', end: '11:30', venue: 'SAUNA RIVER', venueOther: '', description: 'ととのったあとの頭で、仕事の話をしてみる時間。', imageId: '', updatedAt: T },
       { id: 'S5', title: 'ふりかえりの技法', host: 'サンプル主催E', date: '2026-11-13', start: '10:00', end: '11:00', venue: 'SKY ARC', venueOther: '', description: '経験から学ぶための、ふりかえりのやり方を体験します。', imageId: '', updatedAt: T },
       { id: 'S6', title: '即興で学ぶリーダーシップ', host: 'サンプル主催F', date: '2026-11-13', start: '10:30', end: '12:00', venue: 'SKY ARC', venueOther: '', description: 'インプロ（即興劇）を使って、場を動かす感覚をつかみます。', imageId: 'sample3', updatedAt: T },
