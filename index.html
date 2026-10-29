@@ -136,17 +136,25 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 900px) { .heroimg { max-height: 80vh; } .hero .lead { font-size: 17px; } .hero .meta { font-size: 17px; } }
 .sect { max-width: 920px; margin: 0 auto; padding: 8px 16px 0; }
 .sect h2 { font-size: 15px; color: var(--wood); margin: 12px 0 0; letter-spacing: .04em; }
-.tiles { max-width: 1200px; margin: 0 auto; padding: 10px 16px 8px; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
-/* PCは4列×2行（上段＝アプリの中、下段＝外部リンク）。それ未満は2列×4行 */
-@media (min-width: 900px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } .tile .tt { font-size: 15px; } }
-/* 「セッション確認・登録方法」は広い画面では1行、狭いと2行に折る */
-@media (min-width: 1240px) { .tile .tl .ph { white-space: nowrap; } .tile .tl:has(.ph) { white-space: nowrap; } }
+.tiles { max-width: 920px; margin: 0 auto; padding: 10px 16px 8px; display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+/* PC（980px〜）は4列×2行（上段＝アプリの中、下段＝外部リンク）。それ未満は2列×4行 */
+@media (min-width: 980px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } .tile .tt { font-size: 15px; } }
 .tile {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; text-decoration: none; color: var(--ink);
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 14px 12px; min-height: 108px;
 }
 .tile .tt { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: var(--forest); }
-.tile .tt .ext { margin-left: auto; color: var(--muted); }
+/* ↗ はボタンの右下の角に置く（名前の幅を食わないので、狭い列でも名前が1行に収まる） */
+.tile { position: relative; }
+/* PC（マウスのある端末）だけ、カーソルを当てると少し浮く。スマホでは押したあとに浮いたまま残るので付けない */
+@media (hover: hover) and (pointer: fine) {
+  .tile { transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+  .tile:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--forest); cursor: pointer; }
+}
+@media (prefers-reduced-motion: reduce) { .tile { transition: none; } .tile:hover { transform: none; } }
+.tile .tt .ext { position: absolute; bottom: 9px; right: 9px; color: var(--muted); line-height: 0; }
+/* スマホは名前を省略しないので、余白とアイコンの間を少し詰める */
+@media (max-width: 599px) { .tile { padding-left: 12px; padding-right: 12px; } .tile .tt { font-size: 15px; gap: 6px; } }
 .tile .tt .ext svg { width: 16px; height: 16px; }
 .tile .td { color: var(--muted); font-size: 13px; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; text-wrap: pretty; }
 /* 小さいスマホでもタイトルを言葉の途中で折り返さない */
@@ -160,11 +168,17 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (min-width: 900px) { .hero { padding-bottom: 8px; } .tiles { padding-bottom: 20px; } }
 @media (min-width: 900px) { .tile .td { font-size: 12.5px; } .tile .td.nowrap { white-space: nowrap; } .tile .td.nowrap wbr { display: none; } }
 .notes { max-width: 920px; margin: 0 auto; padding: 8px 16px 40px; }
+/* PCの4列では「ラーフェスの歩き方」が1行に収まるよう少しだけ広げ、「メニュー」「お願い」も同じ幅にして端をそろえる */
+@media (min-width: 980px) { .tiles, .sect, .notes { max-width: 960px; } }
 .notes .ext-inline { width: 1em; height: 1em; vertical-align: -0.15em; }
 .notes p { font-size: 13px; color: var(--muted); margin: 6px 0; padding-left: 1em; text-indent: -1em; }
 /* メニューの説明: スマホは短い文（.sm）で2行まで、それより広い画面は元の文（.lg） */
 .tile .td .sm, .tt .sp-only { display: none; }
 @media (max-width: 599px) { .tt .hide-sp { display: none; } .tt .sp-only { display: inline; } .tile .td .lg { display: none; } .tile .td .sm { display: inline; } .tile .td { -webkit-line-clamp: 2; } }
+/* かなり小さいスマホ（340px以下）は説明が2行に収まらないので、4行まで出す */
+/* 360px前後のスマホは左右の余白をもう少し詰めて、説明を2行に収める */
+@media (max-width: 380px) { .tiles { gap: 8px; } .tile { padding-left: 10px; padding-right: 10px; } }
+@media (max-width: 340px) { .tile .td { -webkit-line-clamp: 4; } }
 /* タイル以外の文中でもPC／スマホで言い方を変える（例: Facebookグループ／FBグループ） */
 .sp-only { display: none; }
 @media (max-width: 599px) { .hide-sp { display: none; } .sp-only { display: inline; } }
@@ -641,19 +655,19 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '<div class="sect"><h2>メニュー</h2></div>' +
       '<section class="tiles">' +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>', 'タイムテーブル') +
-          '<span class="td"><span class="lg">ラーフェス全体で<wbr>どんなことが<wbr>起こるのか<wbr>見ることが<wbr>できます</span><span class="sm">ラーフェス全体の<wbr>動きが見られます</span></span>', 'data-go="calendar"') +
+          '<span class="td"><span class="lg">ラーフェス全体で<wbr>どんなことが<wbr>起こるのか見られます</span><span class="sm">ラーフェス全体の<wbr>動きが見られます</span></span>', 'data-go="calendar"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>', '<span class="hide-sp">セッションを探す</span><span class="sp-only">セッション一覧</span>') +
-          '<span class="td"><span class="lg">セッション一覧を<wbr>確認し、<wbr>参加したい<wbr>セッションを<wbr>探すことが<wbr>できます</span><span class="sm">一覧を確認し、<wbr>探すことができます</span></span>', 'data-go="list"') +
+          '<span class="td"><span class="lg">セッション一覧を確認し、<wbr>参加したいものを<wbr>探せます</span><span class="sm">一覧を確認し、<wbr>探すことができます</span></span>', 'data-go="list"') +
         tile(tt('<svg class="i" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>', '場内マップ') +
-          '<span class="td"><span class="lg">セッション会場や<wbr>食事の<wbr>場所を<wbr>確認できます</span><span class="sm">会場や食事の場所を<wbr>確認できます</span></span>', 'data-go="map"') +
-        link(L.howto, tt('<svg class="i" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>', '<span class="hide-sp"><span class="ph">セッション確認・</span><span class="ph">登録方法</span></span><span class="sp-only">登録方法</span>', true) +
-          '<span class="td"><span class="lg">このアプリで<wbr>セッションを<wbr>確認・登録する<wbr>方法です</span><span class="sm">アプリの<wbr>使い方です</span></span>') +
+          '<span class="td"><span class="lg">セッション会場や<wbr>食事の場所を<wbr>確認できます</span><span class="sm">会場や食事の場所を<wbr>確認できます</span></span>', 'data-go="map"') +
+        link(L.howto, tt('<svg class="i" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>', 'アプリの使い方', true) +
+          '<span class="td"><span class="lg">セッションの確認・登録の方法を<wbr>解説しています</span><span class="sm">セッション確認・登録の<wbr>方法を解説しています</span></span>') +
         link(L.guide, tt('<svg class="i" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-1 5"/></svg>', '<span class="ph hide-sp">ラーフェスの</span><span class="ph">歩き方</span>', true) +
           '<span class="td"><span class="lg">はじめての方は、<wbr>まずこちらを<wbr>お読みください</span><span class="sm">はじめての方は、<wbr>まずお読みください</span></span>') +
         link(L.facebook, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>', '<span class="hide-sp">Facebookグループ</span><span class="sp-only">FBグループ</span>', true) +
-          '<span class="td"><span class="lg">お知らせ・<wbr>参加者の交流・<wbr>告知はこちら</span><span class="sm">お知らせ・交流・<wbr>告知はこちら</span></span>') +
-        link(L.radio, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>', '<span class="hide-sp">ラーフェスラジオ</span><span class="sp-only">ラジオ</span>', true) +
-          '<span class="td"><span class="lg">ラーフェスの<wbr>ポッドキャスト<wbr>番組です<wbr>（Spotify）</span><span class="sm">ポッドキャスト<wbr>番組です</span></span>') +
+          '<span class="td"><span class="lg">お知らせ・<wbr>参加者の交流・<wbr>セッション告知はこちら！</span><span class="sm">お知らせ・交流・<wbr>セッション告知はこちら！</span></span>') +
+        link(L.radio, tt('<svg class="i" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg>', 'ラーフェスラジオ', true) +
+          '<span class="td"><span class="lg">Spotifyで聴ける、<wbr>ラーフェスの<wbr>ポッドキャストです</span><span class="sm">ポッドキャスト<wbr>番組です</span></span>') +
         link(L.website, tt('<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>', '公式サイト', true) +
           '<span class="td"><span class="lg">ラーフェス2026の<wbr>公式ページです</span><span class="sm">ラーフェス2026の<wbr>公式ページです</span></span>') +
       '</section>' +
@@ -661,7 +675,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       '<section class="notes">' +
         '<p>・同じ時間に開催場所が被ってしまった場合は、お互いにスペースを調整して開催をお願いします</p>' +
         '<p>・セッションは、登録した人以外も修正・削除できます。ほかの人のセッションは、本人に頼まれたときだけ直してください</p>' +
-        '<p>・右上に ' + ICON_EXT.replace('class="i"', 'class="i ext-inline"') + ' が付いたボタン（使い方・歩き方・Facebookグループ・ラジオ・公式サイト）は新しいタブで開きます。このアプリに戻るときは、そのタブを閉じてください</p>' +
+        '<p>・右下に ' + ICON_EXT.replace('class="i"', 'class="i ext-inline"') + ' が付いたボタン（アプリの使い方・歩き方・Facebookグループ・ラジオ・公式サイト）は新しいタブで開きます。このアプリに戻るときは、そのタブを閉じてください</p>' +
         '<p>・このアプリはホーム画面に追加するとすぐ開けて便利です（iPhone：共有ボタン →「ホーム画面に追加」／Android：︙ →「ホーム画面に追加」）</p>' +
         '<p>・アプリについての確認・問い合わせは、ラーフェス実行委員会：西舘聖哉 までお願いします</p>' +
       '</section>';
