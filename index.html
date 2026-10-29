@@ -445,10 +445,16 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   const venueName = s => s.venue === 'その他' ? (s.venueOther || 'その他') : s.venue;
   // 場所ごとの色。マップの雰囲気に寄せた色相。「その他」はグレー
   const VENUE_HUES = {
-    'SKY FIELD': 135, 'SKY ARC': 205, 'GARAGE LODGE': 28, 'MOONBEAR DECK': 265, 'KIDS BASE': 330,
-    'TAKIBI BASE': 5, 'SAUNA RIVER': 180, 'MORINO HIROBA': 90, 'MORINO HIROBA -MOMI': 70,
-    'MORINO HIROBA -MATSU': 110, 'Main Street': 45, 'Podcast Studio': 300,
+    'SKY FIELD': 135, 'SKY ARC': 205, 'PODCAST STUDIO': 300, 'MOON BEAR': 265, 'KIDS CAMP': 330,
+    'TAKIBI BASE': 5, 'SAUNA RIVER': 180, 'MORINO HIROBA -MOMI': 70, 'MORINO HIROBA -MATSU': 110,
   };
+  // 2025年の会場名で登録された行の読み替え。2026年のマップに無い会場は「その他」＋元の名前にする
+  const VENUE_RENAME = { 'MOONBEAR DECK': 'MOON BEAR', 'KIDS BASE': 'KIDS CAMP', 'Podcast Studio': 'PODCAST STUDIO' };
+  const fixVenues = list => list.map(s => {
+    if (!s.venue || s.venue === 'その他' || state.config.venues.indexOf(s.venue) >= 0) return s;
+    if (VENUE_RENAME[s.venue]) return Object.assign({}, s, { venue: VENUE_RENAME[s.venue] });
+    return Object.assign({}, s, { venue: 'その他', venueOther: s.venueOther || s.venue });
+  });
   const vstyle = v => {
     if (v in VENUE_HUES) return '--h:' + VENUE_HUES[v] + ';--s:48%;';
     if (v === 'その他') return '--h:40;--s:6%;';
@@ -800,7 +806,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   }
 
   function mapHtml() {
-    return '<div class="mapwrap"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、PODCAST STUDIO、RIDGE LODGE、GARAGE LODGE、CENTER FIELD、MOON BEAR、CENTER HOUSE、KIDS CAMP、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA -MOMI・-MATSU、Main Street の位置" style="width:' + (state.zoom * 100) + '%"></div>';
+    return '<div class="mapwrap"><img id="mapImg" alt="ライジングフィールド軽井沢の場内マップ。SKY FIELD、SKY ARC、PODCAST STUDIO、MOON BEAR、KIDS CAMP、TAKIBI BASE、SAUNA RIVER、MORINO HIROBA -MOMI・-MATSU の位置" style="width:' + (state.zoom * 100) + '%"></div>';
   }
 
   function renderMap() {
@@ -1106,7 +1112,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   }
 
   function reload() {
-    return call('getSessions').then(list => { state.sessions = list; });
+    return call('getSessions').then(list => { state.sessions = fixVenues(list); });
   }
 
   // ---------- 操作 ----------
@@ -1148,7 +1154,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   // ---------- 起動（ファイルの最後で呼ぶ） ----------
   function start() {
     Promise.all([call('getBootstrap'), getParams()]).then(([boot, params]) => {
-      state.config = boot.config; state.sessions = boot.sessions;
+      state.config = boot.config; state.sessions = fixVenues(boot.sessions);
       // 共有リンクは、いま開いている画面のURLを基準にする（GitHub Pages なら github.io のURL）
       state.baseUrl = USE_API ? location.href.split(/[?#]/)[0] : boot.baseUrl;
       const hash = IS_GAS ? '' : location.hash.slice(1);
@@ -1180,7 +1186,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         { date: '2026-11-13', label: '11/13(金)', start: '07:00', end: '23:00' },
         { date: '2026-11-14', label: '11/14(土)', start: '07:00', end: '15:00' },
       ],
-      venues: ['SKY FIELD', 'SKY ARC', 'GARAGE LODGE', 'MOONBEAR DECK', 'KIDS BASE', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'Main Street', 'Podcast Studio', 'その他'],
+      venues: ['SKY FIELD', 'SKY ARC', 'MOON BEAR', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'KIDS CAMP', 'PODCAST STUDIO', 'その他'],
       fixed: [
         { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付', notSession: true },
         {
@@ -1208,19 +1214,18 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         website: 'https://learning-fest.jp/',
       },
     };
-    const KEY = 'larfes-mock-v4';
+    const KEY = 'larfes-mock-v5';
     const T = '2026-10-16 18:00:00';
     const seed = [
       { id: 'S1', title: '焚き火を囲んで、問いを持ち寄る', host: 'サンプル主催A', date: '2026-11-12', start: '19:00', end: '20:30', venue: 'TAKIBI BASE', venueOther: '', description: '今年いちばん考えたことを1つ持ってきてください。', imageId: 'sample1', updatedAt: T },
-      { id: 'S2', title: '朝の森を歩く', host: 'サンプル主催B', date: '2026-11-13', start: '07:00', end: '08:00', venue: 'MORINO HIROBA', venueOther: '', description: '朝ごはん前に、森をゆっくり歩きます。歩きやすい靴で。', imageId: 'sample2', updatedAt: T },
-      { id: 'S3', title: '子どもと作る、ダンボール秘密基地', host: 'サンプル主催C', date: '2026-11-13', start: '10:00', end: '12:00', venue: 'KIDS BASE', venueOther: '', description: 'ダンボールとガムテープで、大人も子どもも本気で作ります。', imageId: '', updatedAt: T },
+      { id: 'S2', title: '朝の森を歩く', host: 'サンプル主催B', date: '2026-11-13', start: '07:00', end: '08:00', venue: 'MORINO HIROBA -MOMI', venueOther: '', description: '朝ごはん前に、森をゆっくり歩きます。歩きやすい靴で。', imageId: 'sample2', updatedAt: T },
+      { id: 'S3', title: '子どもと作る、ダンボール秘密基地', host: 'サンプル主催C', date: '2026-11-13', start: '10:00', end: '12:00', venue: 'KIDS CAMP', venueOther: '', description: 'ダンボールとガムテープで、大人も子どもも本気で作ります。', imageId: '', updatedAt: T },
       { id: 'S4', title: 'サウナと対話', host: 'サンプル主催D', date: '2026-11-13', start: '10:30', end: '11:30', venue: 'SAUNA RIVER', venueOther: '', description: 'ととのったあとの頭で、仕事の話をしてみる時間。', imageId: '', updatedAt: T },
       { id: 'S5', title: 'ふりかえりの技法', host: 'サンプル主催E', date: '2026-11-13', start: '10:00', end: '11:00', venue: 'SKY ARC', venueOther: '', description: '経験から学ぶための、ふりかえりのやり方を体験します。', imageId: '', updatedAt: T },
       { id: 'S6', title: '即興で学ぶリーダーシップ', host: 'サンプル主催F', date: '2026-11-13', start: '10:30', end: '12:00', venue: 'SKY ARC', venueOther: '', description: 'インプロ（即興劇）を使って、場を動かす感覚をつかみます。', imageId: 'sample3', updatedAt: T },
       { id: 'S7', title: '芝生でひらく、はじまりの対話', host: 'サンプル主催G', date: '2026-11-12', start: '14:30', end: '16:00', venue: 'SKY FIELD', venueOther: '', description: 'オープニングのあと、芝生に輪になって「ここで何をしたいか」を話します。', imageId: '', updatedAt: T },
-      { id: 'S8', title: 'ガレージで語る、小さな事業のつくり方', host: 'サンプル主催H', date: '2026-11-12', start: '16:30', end: '18:00', venue: 'GARAGE LODGE', venueOther: '', description: '副業・スモールビジネスを始めた人の話を聞き、みんなで質問しあいます。', imageId: '', updatedAt: T },
-      { id: 'S9', title: '星空の下で、ひとり時間', host: 'サンプル主催I', date: '2026-11-12', start: '21:00', end: '22:00', venue: 'MOONBEAR DECK', venueOther: '', description: 'デッキで寝転んで星を見ます。しゃべらなくてOK。防寒具をお忘れなく。', imageId: '', updatedAt: T },
-      { id: 'S10', title: 'Main Street 立ち話マーケット', host: 'サンプル主催J', date: '2026-11-13', start: '13:00', end: '14:30', venue: 'Main Street', venueOther: '', description: '通りすがりに立ち寄れる、ゆるい名刺交換と雑談の場です。', imageId: '', updatedAt: T },
+      { id: 'S8', title: 'ポッドキャストで語る、小さな事業のつくり方', host: 'サンプル主催H', date: '2026-11-12', start: '16:30', end: '18:00', venue: 'PODCAST STUDIO', venueOther: '', description: '副業・スモールビジネスを始めた人の話を聞き、みんなで質問しあいます。', imageId: '', updatedAt: T },
+      { id: 'S9', title: '星空の下で、ひとり時間', host: 'サンプル主催I', date: '2026-11-12', start: '21:00', end: '22:00', venue: 'MOON BEAR', venueOther: '', description: 'デッキで寝転んで星を見ます。しゃべらなくてOK。防寒具をお忘れなく。', imageId: '', updatedAt: T },
       { id: 'S11', title: '受付前で、朝のラジオ体操', host: 'サンプル主催K', date: '2026-11-14', start: '07:30', end: '08:00', venue: 'その他', venueOther: '受付前の広場', description: '最終日の朝、からだをほぐしてから始めましょう。', imageId: '', updatedAt: T },
       { id: 'S12', title: '最終日のふりかえり焚き火', host: 'サンプル主催L', date: '2026-11-14', start: '11:00', end: '12:30', venue: 'TAKIBI BASE', venueOther: '', description: '3日間で持ち帰りたいことを、ひとことずつ火にくべます。', imageId: '', updatedAt: T },
       { id: 'S13', title: '空を見上げるヨガ', host: 'サンプル主催M', date: '2026-11-14', start: '09:00', end: '10:00', venue: 'SKY FIELD', venueOther: '', description: 'ヨガマットは貸し出しあり。初めての人も歓迎です。', imageId: '', updatedAt: T },
