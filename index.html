@@ -302,7 +302,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   #results .group { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; }
   #results .group h3 { grid-column: 1 / -1; }
 }
-.scard .s { color: var(--muted); font-size: 13px; display: block; }
+.scard .s { color: color-mix(in srgb, var(--muted) 75%, var(--ink)); font-size: 13px; display: block; } /* 主催・場所は少しだけ濃く（11/11 本人） */
 /* 主催・場所は1行で、長いときは「…」で省略する */
 .scard > div:first-child { min-width: 0; }
 .scard .s.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -310,7 +310,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 @media (max-width: 719px) { .scard .s { font-size: 12px; } }
 .scard .w { color: var(--forest); font-weight: 700; font-size: 13px; display: block; }
 /* セッション内容をカードに2行まで出す（あふれたら「…」。改行は詰める）（11/11 本人） */
-.scard .sd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 12px; line-height: 1.55; color: var(--ink); opacity: .85; }
+.scard .sd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 12px; line-height: 1.55; color: var(--ink); opacity: .93; }
 @media (max-width: 719px) { .scard .sd { font-size: 11.5px; } }
 .thumb { width: 116px; height: 74px; border-radius: 10px; overflow: hidden; background: var(--forest-soft); }
 .thumb img, .dimg img, .sumimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
