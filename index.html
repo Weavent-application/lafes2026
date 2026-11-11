@@ -843,7 +843,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     const fixed = state.config.fixed.filter(f => !f.notSession).map(f => Object.assign({ fixedIndex: state.config.fixed.indexOf(f) }, f));
     const list = state.sessions.concat(fixed).sort(byTime)
       .filter(s => state.showPast || endKey(s) > now)
-      .filter(s => !state.venue || s.venue === state.venue)
+      // PODCAST STUDIO のセッションは一覧に出さない（11/11 本人）。会場で PODCAST STUDIO を選んだとき（マップの会場名から来たときも）だけ出す
+      .filter(s => state.venue ? s.venue === state.venue : s.venue !== 'PODCAST STUDIO')
       .filter(s => !q || [s.title, s.host, venueName(s), s.description].join(' ').toLowerCase().indexOf(q) >= 0);
     const $r = document.getElementById('results');
     if (!list.length) {
