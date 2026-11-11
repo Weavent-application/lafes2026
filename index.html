@@ -1268,8 +1268,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       // ボタンから開いたときは毎回まっさらにする（11/11 本人）
       // 一覧（セッションを探す）: 前に選んだ会場の絞り込みを外す（マップの会場名から来たときは上で会場を入れてから go する）
       if (v === 'list') state.venue = '';
-      // タイムテーブル: 会期中なら今日のタブを開く（会期前は1日目のまま）
-      if (v === 'calendar') { const td = todayStr(); if (state.config && state.config.days.some(d => d.date === td)) state.day = td; }
+      // タイムテーブル: 前に選んだ日付は持ち越さず、はじめの日に戻す（会期中は今日、それ以外は1日目。renderCalendar が決める）
+      if (v === 'calendar') state.day = null;
       // 場内マップ: 拡大を戻して、はじめの位置（左上・全体が見える大きさ）から見せる
       if (v === 'map') state.zoom = 1;
       return go(v);
