@@ -313,6 +313,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .scard { position: relative; }
 .scard .tags { position: absolute; top: 8px; right: 10px; display: flex; gap: 4px; }
 .scard .tags .tag { margin-left: 0; }
+.scard:has(.tags) .thumb { margin-top: 20px; } /* 札と写真が重ならないよう、札付きのカードは写真を少し下げる */
 /* 日時は目を引くよう2つ大きく、1行（11/11 本人） */
 /* セッション内容をカードに2行まで出す（あふれたら「…」。改行は詰める）（11/11 本人） */
 .scard .sd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 12px; line-height: 1.55; color: var(--ink); opacity: .93; }
