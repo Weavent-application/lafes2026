@@ -295,7 +295,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   width: 100%; display: grid; grid-template-columns: 1fr 116px; gap: 12px; align-items: center; text-align: left;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; margin-bottom: 10px;
 }
-.scard .t { font-weight: 700; font-size: 15.5px; display: block; line-height: 1.45; }
+.scard .t { font-weight: 700; font-size: 16.5px; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; } /* 探しやすさ優先で1つ大きく、2行まで（11/11 本人） */
 /* PCは一覧を2列で並べる（1列だと左右が空きすぎるため） */
 @media (min-width: 900px) {
   .page.wide { max-width: 1080px; }
@@ -308,7 +308,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .scard .s.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* スマホは主催・場所を小さめにして、1行に入る文字を増やす */
 @media (max-width: 719px) { .scard .s { font-size: 12px; } }
-.scard .w { color: var(--forest); font-weight: 700; font-size: 13px; display: block; }
+.scard .w { color: var(--forest); font-weight: 700; font-size: 15px; display: flex; flex-wrap: wrap; align-items: center; row-gap: 2px; column-gap: 6px; white-space: nowrap; } .scard .w .tag { margin-left: 0; } /* 日時は目を引くよう2つ大きく（11/11 本人）。日時は1行のまま、入りきらないときは「全体」「開催中」の札だけ次の行へ */
 /* セッション内容をカードに2行まで出す（あふれたら「…」。改行は詰める）（11/11 本人） */
 .scard .sd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-top: 4px; font-size: 12px; line-height: 1.55; color: var(--ink); opacity: .93; }
 @media (max-width: 719px) { .scard .sd { font-size: 11.5px; } }
