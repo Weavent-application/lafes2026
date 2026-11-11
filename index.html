@@ -244,7 +244,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   border: 1px solid var(--forest); background: var(--forest-soft); color: var(--ink); font-size: 12.5px; line-height: 1.35;
   box-shadow: 0 1px 0 rgba(0,0,0,.04);
 }
-.ev .t { font-weight: 700; display: block; }
+.ev .t { font-weight: 700; display: block; font-size: 11.5px; } /* タイトルは本文より1つ小さく（11/11 本人） */
 .ev .s { color: var(--muted); font-size: 11.5px; }
 /* 場所ごとの色。--h（色相）と --s（彩度）は場所ごとに JS で入れる */
 .ev, .vhead, .scard, dl.info dd { --h: 140; --s: 45%; }
@@ -718,6 +718,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     syncGridHead(); scrollGridToNow();
   }
 
+  const VENUE_WIDTH = { 'SKY FIELD': 1.5 };
   function gridHtml() {
     const c = state.config;
     const day = dayOf(state.day);
@@ -731,7 +732,9 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     let head = '<div class="ghead" id="gridHead" aria-hidden="true"><div class="grid"><div class="corner"></div>';
     c.venues.forEach(v => { head += '<div class="vhead" style="' + vstyle(v) + '">' + esc(v) + '</div>'; });
     head += '</div></div>';
-    let html = head + '<div class="grid-wrap" id="gridWrap"><div class="grid" style="grid-template-columns: var(--timecol) repeat(' + c.venues.length + ', minmax(var(--col), max-content));">';
+    // SKY FIELD は中で複数のセッションを同時に開けるので、列を1.5倍にする（11/11 本人）
+    const colW = v => 'calc(var(--col) * ' + (VENUE_WIDTH[v] || 1) + ')';
+    let html = head + '<div class="grid-wrap" id="gridWrap"><div class="grid" style="grid-template-columns: var(--timecol) ' + c.venues.map(v => 'minmax(' + colW(v) + ', max-content)').join(' ') + ';">';
     html += '<div class="corner"></div>';
     c.venues.forEach(v => { html += '<div class="vhead" style="' + vstyle(v) + '">' + esc(v) + '</div>'; });
 
@@ -741,7 +744,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
     c.venues.forEach(v => {
       const evs = layoutLanes(items.filter(s => s.venue === v));
-      html += '<div class="col" data-venue="' + esc(v) + '" style="height:' + height + 'px">';
+      html += '<div class="col" data-venue="' + esc(v) + '" style="height:' + height + 'px;min-width:' + colW(v) + '">';
       evs.forEach(e => {
         const s = e.s;
         const top = px(toMin(s.start)), h = Math.max(px(toMin(s.end)) - top - 2, 22);
