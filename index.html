@@ -309,6 +309,9 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 /* スマホは主催・場所を小さめにして、1行に入る文字を増やす */
 @media (max-width: 719px) { .scard .s { font-size: 12px; } }
 .scard .w { color: var(--forest); font-weight: 700; font-size: 13px; display: block; }
+/* セッション内容をカードに入るだけ出す（3行まで、あふれたら「…」。改行は詰める）（11/11 本人） */
+.scard .sd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; margin-top: 6px; font-size: 13px; line-height: 1.55; color: var(--ink); opacity: .85; }
+@media (max-width: 719px) { .scard .sd { font-size: 12.5px; } }
 .thumb { width: 116px; height: 74px; border-radius: 10px; overflow: hidden; background: var(--forest-soft); }
 .thumb img, .dimg img, .sumimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .noimg { width: 100%; height: 100%; display: grid; place-items: center; font-family: "Zen Maru Gothic", sans-serif; font-weight: 700; color: #fff; font-size: 30px;
@@ -859,6 +862,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         '<span class="t">' + esc(s.title) + '</span>' +
         (s.host ? '<span class="s one">主催：' + esc(s.host) + '</span>' : '') +
         (s.venue ? '<span class="s one">場所：' + esc(venueName(s)) + '</span>' : '') +
+        (s.description ? '<span class="sd">' + esc(String(s.description).replace(/\s+/g, ' ').trim()) + '</span>' : '') +
         '</div><div class="thumb">' + imgHtml(s) + '</div></button>';
     };
     const live = list.filter(s => startKey(s) <= now && now < endKey(s));
