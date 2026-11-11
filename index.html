@@ -270,6 +270,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 }
 /* 枠の名前は左端の会場（SKY FIELD）の列の下あたりに出す */
 .band span { width: var(--col); text-align: center; }
+.band .bnote { display: block; margin-top: 2px; font-size: 11px; font-weight: 500; }
 .nowline { position: absolute; left: var(--timecol); right: 0; height: 2px; background: var(--accent); z-index: 2; pointer-events: none; }
 
 /* 日付ごとの見出し（セッション一覧） */
@@ -749,7 +750,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
     // 事務局の基本枠（全会場にかかる帯）
     c.fixed.filter(f => f.date === state.day).forEach(f => {
-      html += '<button type="button" class="band" data-fixed="' + c.fixed.indexOf(f) + '" style="top:' + (44 + px(toMin(f.start))) + 'px;height:' + (px(toMin(f.end)) - px(toMin(f.start))) + 'px"><span>' + esc(f.title) + '</span></button>';
+      html += '<button type="button" class="band" data-fixed="' + c.fixed.indexOf(f) + '" style="top:' + (44 + px(toMin(f.start))) + 'px;height:' + (px(toMin(f.end)) - px(toMin(f.start))) + 'px"><span>' + esc(f.title) + (f.note ? '<small class="bnote">' + esc(f.note) + '</small>' : '') + '</span></button>';
     });
 
     if (state.day === todayStr()) {
@@ -1325,7 +1326,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       ],
       venues: ['SKY FIELD', 'SKY ARC', 'GARAGE LODGE', 'MOON BEAR', 'TAKIBI BASE', 'SAUNA RIVER', 'MORINO HIROBA -MOMI', 'MORINO HIROBA -MATSU', 'PODCAST STUDIO', 'その他'],
       fixed: [
-        { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付', notSession: true },
+        { date: '2026-11-12', start: '11:00', end: '13:00', title: '開場・受付', note: '（11:30から昼食購入できます）', description: '11:30から昼食を購入できます。', notSession: true },
         {
           date: '2026-11-12', start: '13:00', end: '14:00', title: 'オープニングセッション',
           host: 'ラーフェス実行委員会', venue: 'SKY FIELD',
