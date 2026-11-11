@@ -724,8 +724,8 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     }
 
     const tabs = c.days.map(d => {
-      // 事務局の基本枠（登録できない枠）も数に入れる
-      const count = state.sessions.filter(s => s.date === d.date).length + c.fixed.filter(f => f.date === d.date && !f.notSession).length;
+      // 事務局の基本枠（登録できない枠）も数に入れる。PODCAST STUDIOは数えない
+      const count = state.sessions.filter(s => s.date === d.date && s.venue !== 'PODCAST STUDIO').length + c.fixed.filter(f => f.date === d.date && !f.notSession && f.venue !== 'PODCAST STUDIO').length;
       return '<button class="tab" role="tab" type="button" data-day="' + d.date + '" aria-selected="' + (d.date === state.day) + '">' + esc(d.label) + '（' + count + '）</button>';
     }).join('');
 
