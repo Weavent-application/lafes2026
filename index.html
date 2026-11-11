@@ -231,7 +231,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 }
 .grid .corner { left: 0; z-index: 4; }
 .timecol { position: sticky; left: 0; z-index: 2; background: var(--surface); border-right: 1px solid var(--line); }
-.timecol div { height: var(--hour); font-size: 12px; color: var(--muted); text-align: right; padding: 0 6px; transform: translateY(-9px); }
+.timecol div { height: var(--hour); font-size: 12px; color: color-mix(in srgb, var(--muted) 75%, var(--ink)); text-align: right; padding: 0 6px; transform: translateY(-9px); }
 .timecol div:first-child { transform: none; }
 .grid .vhead, .nw { white-space: nowrap; }
 /* 列幅は基本 --col。会場名が長い列（MORINO HIROBA -MATSU など）だけ名前に合わせて広がる */
@@ -245,7 +245,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   box-shadow: 0 1px 0 rgba(0,0,0,.04);
 }
 .ev .t { font-weight: 700; display: block; font-size: 11.5px; } /* タイトルは本文より1つ小さく（11/11 本人） */
-.ev .s { color: var(--muted); font-size: 11.5px; }
+.ev .s { color: color-mix(in srgb, var(--muted) 75%, var(--ink)); font-size: 11.5px; } /* 時刻・主催は少しだけ濃く（11/11 本人） */
 /* 場所ごとの色。--h（色相）と --s（彩度）は場所ごとに JS で入れる */
 .ev, .vhead, .scard, dl.info dd { --h: 140; --s: 45%; }
 .ev { border-color: hsl(var(--h) var(--s) 38%); background: hsl(var(--h) var(--s) 92%); border-left-width: 4px; }
@@ -266,7 +266,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
   position: absolute; left: var(--timecol); right: 0; z-index: 1; cursor: pointer;
   font-family: inherit; padding: 0; border-left: 0; border-right: 0; border-radius: 0;
   background: var(--fixed); opacity: .9; display: flex; align-items: center; justify-content: flex-start;
-  font-size: 12px; font-weight: 700; color: var(--muted); border-top: 1px dashed var(--wood); border-bottom: 1px dashed var(--wood);
+  font-size: 12px; font-weight: 700; color: color-mix(in srgb, var(--muted) 75%, var(--ink)); border-top: 1px dashed var(--wood); border-bottom: 1px dashed var(--wood);
 }
 /* 枠の名前は左端の会場（SKY FIELD）の列の下あたりに出す */
 .band span { width: var(--col); text-align: center; }
