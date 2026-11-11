@@ -1263,7 +1263,17 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       return go('list');
     }
     if (t.hasAttribute('data-close')) return closeModal();
-    if (t.hasAttribute('data-go')) return go(t.getAttribute('data-go'));
+    if (t.hasAttribute('data-go')) {
+      const v = t.getAttribute('data-go');
+      // ボタンから開いたときは毎回まっさらにする（11/11 本人）
+      // 一覧（セッションを探す）: 前に選んだ会場の絞り込みを外す（マップの会場名から来たときは上で会場を入れてから go する）
+      if (v === 'list') state.venue = '';
+      // タイムテーブル: 会期中なら今日のタブを開く（会期前は1日目のまま）
+      if (v === 'calendar') { const td = todayStr(); if (state.config && state.config.days.some(d => d.date === td)) state.day = td; }
+      // 場内マップ: 拡大を戻して、はじめの位置（左上・全体が見える大きさ）から見せる
+      if (v === 'map') state.zoom = 1;
+      return go(v);
+    }
     if (t.hasAttribute('data-new')) return showForm();
     if (t.hasAttribute('data-day')) { state.day = t.getAttribute('data-day'); return render(); }
     if (t.hasAttribute('data-id')) return showDetail(t.getAttribute('data-id'));
