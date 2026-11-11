@@ -431,6 +431,15 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 
 @media (max-width: 719px) {
   :root { --col: 132px; --timecol: 44px; --tabbar: calc(64px + env(safe-area-inset-bottom)); }
+  /* スマホのタイムテーブルは、開いたときに MOON BEAR の半分くらいまで見える幅にする（11/11 本人）。
+     表の幅（画面−34px）から時刻の列を引いた残りを3列ぶん（SKY FIELD 1.5＋SKY ARC 1＋MOON BEAR 0.5）で割る。
+     文字は列の幅と同じ割合で小さくして、1行に入る文字数を元（列132px）と変えない。--u は元の1pxが今いくつか */
+  :root { --timecol: 36px; --u: min(1px, calc((100vw - 70px) / 396)); --col: calc(var(--u) * 132); }
+  .ev { font-size: calc(var(--u) * 12.5); padding: calc(var(--u) * 4) calc(var(--u) * 8); border-radius: calc(var(--u) * 10); }
+  .ev .t { font-size: calc(var(--u) * 11.5); }
+  .ev .s { font-size: calc(var(--u) * 11.5); }
+  .grid .vhead { font-size: calc(var(--u) * 13); }
+  .timecol div { font-size: calc(var(--u) * 12); padding: 0 4px; }
   .tabbar { display: grid; }
   .fab { display: flex; }
   #app { padding-bottom: 88px; }
