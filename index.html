@@ -770,7 +770,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         const top = px(toMin(s.start)), h = Math.max(px(toMin(s.end)) - top - 2, 22);
         const w = 100 / e.lanes;
         html += '<button type="button" class="ev" data-id="' + esc(s.id) + '" style="' + vstyle(s.venue) + 'top:' + (top + 1) + 'px;height:' + h + 'px;left:calc(' + (e.lane * w) + '% + 3px);width:calc(' + w + '% - 6px)">' +
-          '<span class="t">' + esc(s.title) + '</span><span class="s">' + esc(s.start) + '–' + esc(s.end) + '・' + esc(s.host) + (s.venue === 'その他' ? '・' + esc(s.venueOther) : '') + '</span></button>';
+          '<span class="t">' + esc(s.title) + '</span><span class="s">' + esc(s.start) + '–' + esc(s.end) + '<br>' + esc(s.host) + (s.venue === 'その他' ? '・' + esc(s.venueOther) : '') + '</span></button>';
       });
       html += '</div>';
     });
