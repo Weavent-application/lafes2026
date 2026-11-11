@@ -288,7 +288,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 .filters input[type=search] { flex: 1 1 220px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 16px; }
 .filters label { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; font-weight: 600; color: var(--muted); }
 .filters input[type=checkbox] { width: 18px; height: 18px; }
-/* 検索窓は1行使い、その下に会場のプルダウンと「終わったものも表示」 */
+/* 検索窓は1行使い、その下に会場のプルダウンと「終了したものも表示」 */
 .filters input[type=search] { flex-basis: 100%; }
 .filters select { flex: 1 1 220px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; }
 .scard {
@@ -823,7 +823,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
           '<select id="venue" aria-label="会場でさがす"><option value="">すべての会場</option>' +
             state.config.venues.map(v => '<option value="' + esc(v) + '"' + (state.venue === v ? ' selected' : '') + '>' + esc(v) + '</option>').join('') +
           '</select>' +
-          '<label><input type="checkbox" id="past"' + (state.showPast ? ' checked' : '') + '>終わったものも表示</label>' +
+          '<label><input type="checkbox" id="past"' + (state.showPast ? ' checked' : '') + '>終了したものも表示</label>' +
         '</div>' +
         '<div id="results"></div>' +
       '</div>';
