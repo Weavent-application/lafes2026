@@ -270,7 +270,7 @@ svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-widt
 }
 /* 枠の名前は左端の会場（SKY FIELD）の列の下あたりに出す */
 .band span { width: var(--col); text-align: center; }
-.band .bnote { display: block; margin-top: 3px; font-size: 12px; font-weight: 600; }
+.band .bnote { display: block; margin-top: 3px; margin-left: -0.5em; font-size: 12px; font-weight: 600; } /* 全角「（」の左の余白ぶん戻して、上の行と頭をそろえる */
 /* 基本枠の名前は会場の列をまたいで横に広げ、画面の幅に収める（11/11 本人。スマホ・PCとも） */
 .band span { width: auto; max-width: calc(100vw - var(--timecol) - 56px); padding: 0 14px; text-align: left; }
 /* PCは基本枠の文字を大きく（11/11 本人） */
