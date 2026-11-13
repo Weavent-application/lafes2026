@@ -1207,6 +1207,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     const img = { mode: 'keep', data: null };
 
     openModal(
+      XCLOSE + // 右上の×で閉じる（11/13 本人）
       '<h2>' + (edit ? 'セッションを修正する' : 'セッションを登録する') + '</h2>' +
       '<p class="sub">' + (edit ? '直したいところを変えて、いちばん下の「更新する」を押してください。' : 'ログインは要りません。登録するとすぐタイムテーブルに載ります。') + '</p>' +
       '<form id="sform" novalidate>' +
