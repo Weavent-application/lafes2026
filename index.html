@@ -521,6 +521,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
 .chat .pv img { height: 48px; border-radius: 6px; }
 .chat .pv button { border: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 12px; padding: 0; }
 .chat .note2 { font-size: 11px; color: var(--muted); margin: 0; }
+.updbar { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 80; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 700; font-size: 14px; padding: 10px 18px; box-shadow: 0 6px 18px rgba(0, 0, 0, .25); white-space: nowrap; }
 .imgview { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .85); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .imgview img { max-width: 100%; max-height: 100%; border-radius: 8px; }
 @media (max-width: 719px) {
@@ -1567,6 +1568,40 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     setInterval(() => { if (!chat.open) loadChat(); }, 60000);
   }
 
+  // ---------- 新しい版の知らせ（11/13 本人） ----------
+  // 開いたままの画面は古い版のまま動く。5分ごと（と画面に戻ったとき）に公開中のページを読み直し、
+  // 開いたときと中身が変わっていたら上に「更新する」の帯を出す。入力中でなければ、画面に戻ったときに自動で読み直す
+  function initUpdateCheck() {
+    if (!USE_API) return;
+    const src = location.href.split(/[?#]/)[0];
+    const hash = t => { let h = 0; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; return h; };
+    let base = null, newer = false;
+    const busy = () => !$modal.hidden || (document.getElementById('chatText') && document.getElementById('chatText').value.trim());
+    function show() {
+      if (document.getElementById('updbar')) return;
+      const bar = document.createElement('button');
+      bar.type = 'button'; bar.id = 'updbar'; bar.className = 'updbar';
+      bar.textContent = 'アプリが新しくなりました。押して更新';
+      bar.addEventListener('click', () => location.reload());
+      document.body.appendChild(bar);
+    }
+    function check() {
+      return fetch(src + '?upd=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : null).then(t => {
+        if (!t) return;
+        const h = hash(t);
+        if (base === null) { base = h; return; }
+        if (h !== base) { newer = true; show(); }
+      }).catch(() => {});
+    }
+    check();
+    setInterval(() => { if (!document.hidden) check(); }, 5 * 60000);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) return;
+      if (newer && !busy()) { location.reload(); return; }
+      check();
+    });
+  }
+
   // ---------- 起動（ファイルの最後で呼ぶ） ----------
   function start() {
     Promise.all([call('getBootstrap'), getParams()]).then(([boot, params]) => {
@@ -1577,6 +1612,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       state.view = VIEWS.indexOf(params.page || hash) >= 0 ? (params.page || hash) : 'top';
       render();
       initChat();
+      initUpdateCheck();
       // ?s=セッションID で、そのセッションの詳細を開く（告知用のリンク）
       if (params.s) {
         const s = state.sessions.find(x => x.id === params.s);
