@@ -476,6 +476,58 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   .bar nav { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+/* みんなのつぶやき（11/13 本人。ログインなしの簡易チャット。右下のボタンで開く。登録の丸ボタンは左下へ） */
+.chatfab {
+  position: fixed; right: 24px; bottom: 24px; z-index: 45;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 52px; padding: 0 20px 0 16px;
+  border: 0; border-radius: 999px; background: var(--forest); color: #fff;
+  font: inherit; font-weight: 700; font-size: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+}
+.chatfab svg.i { width: 22px; height: 22px; }
+.chatfab .badge { position: absolute; top: -6px; right: -4px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 12px; line-height: 22px; text-align: center; }
+.chatfab .badge[hidden] { display: none; }
+.chat {
+  position: fixed; right: 24px; bottom: 88px; z-index: 46;
+  width: 380px; height: min(620px, calc(100vh - 140px));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 12px 36px rgba(0, 0, 0, .22);
+}
+.chat[hidden] { display: none; }
+.chat .ch { display: flex; align-items: center; gap: 8px; padding: 12px 12px 10px 16px; border-bottom: 1px solid var(--line); }
+.chat .ch h2 { margin: 0; font-size: 17px; color: var(--forest); flex: 1; }
+.chat .ch .x { width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--forest-soft); color: var(--forest); display: inline-flex; align-items: center; justify-content: center; }
+.chat .ch .x svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.4; fill: none; stroke-linecap: round; }
+.chat .cl { flex: 1; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); overscroll-behavior: contain; }
+.chat .cl .empty { color: var(--muted); font-size: 13px; text-align: center; margin: auto 0; }
+.chat .msg { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px 10px; }
+.chat .msg.mine { border-color: var(--forest); }
+.chat .msg .mh { display: flex; gap: 8px; align-items: baseline; font-size: 12px; color: var(--muted); }
+.chat .msg .mh b { font-size: 13.5px; color: var(--forest); }
+.chat .msg .mt { margin-top: 2px; font-size: 14.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat .msg img { display: block; margin-top: 6px; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; cursor: zoom-in; background: var(--forest-soft); } /* タイムラインは16:9で中央を切り取る。押すと全体を表示（11/13 本人） */
+.chat form { border-top: 1px solid var(--line); padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); display: grid; gap: 6px; background: var(--surface); }
+.chat input[type="text"], .chat textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; background: var(--bg); font-size: 16px; }
+.chat textarea { resize: none; height: 64px; line-height: 1.5; }
+.chat .cf { display: flex; align-items: center; gap: 8px; }
+.chat .cf .cnt { font-size: 12px; color: var(--muted); margin-right: auto; }
+.chat .cf .cnt.over { color: #c0392b; font-weight: 700; }
+.chat .ph-btn { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 13px; color: var(--forest); font-weight: 600; cursor: pointer; }
+.chat .ph-btn svg.i { width: 18px; height: 18px; }
+.chat .send { border: 0; border-radius: 999px; background: var(--forest); color: #fff; font-weight: 700; padding: 7px 18px; font-size: 14px; }
+.chat .send:disabled { opacity: .5; }
+.chat .pv { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.chat .pv[hidden] { display: none; }
+.chat .pv img { height: 48px; border-radius: 6px; }
+.chat .pv button { border: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 12px; padding: 0; }
+.chat .note2 { font-size: 11px; color: var(--muted); margin: 0; }
+.imgview { position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .85); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.imgview img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+@media (max-width: 719px) {
+  .fab { right: auto; left: 16px; }
+  .chatfab { right: 16px; bottom: calc(22px + var(--tabbar)); min-height: 48px; padding: 0 14px 0 12px; font-size: 13.5px; }
+  .chat { inset: 0; width: auto; height: 100dvh; border-radius: 0; border: 0; z-index: 65; }
+}
 </style>
 </head>
 <body>
@@ -498,6 +550,18 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   <button type="button" data-go="map"><svg class="i" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>マップ</button>
 </nav>
 <button type="button" class="fab" data-new><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>セッション<br>登録</span></button>
+<button type="button" class="chatfab" id="chatFab" aria-controls="chat" aria-expanded="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>みんなのつぶやき<span class="badge" id="chatBadge" hidden></span></button>
+<section class="chat" id="chat" role="dialog" aria-label="みんなのつぶやき" hidden>
+  <div class="ch"><h2>みんなのつぶやき</h2><button type="button" class="x" id="chatClose" aria-label="閉じる"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="cl" id="chatList" aria-live="polite"><p class="empty">読み込み中…</p></div>
+  <form id="chatForm" autocomplete="off">
+    <input type="text" id="chatName" maxlength="20" placeholder="名前（ニックネームでOK）" aria-label="名前">
+    <textarea id="chatText" placeholder="いま感じていること、見つけたこと" aria-label="本文"></textarea>
+    <div class="pv" id="chatPv" hidden></div>
+    <div class="cf"><span class="cnt" id="chatCnt">0/140</span><label class="ph-btn"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>写真<input type="file" id="chatFile" accept="image/*" hidden></label><button type="submit" class="send" id="chatSend">送る</button></div>
+    <p class="note2">投稿はアプリを開いた全員に公開されます。運営の判断で非表示にすることがあります。</p>
+  </form>
+</section>
 <div class="modal" id="modal" hidden><div class="sheet" role="dialog" aria-modal="true" id="sheet"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1378,6 +1442,131 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
   });
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && !$modal.hidden) closeModal(); });
 
+  // ---------- みんなのつぶやき（11/13 本人） ----------
+  // ログインなし。名前・本文（140字まで）・写真（任意）。開いている間は30秒、閉じている間は1分ごとに新着を見る
+  const CHAT_MAX = 140;
+  const chatEl = document.getElementById('chat');
+  const chat = { list: [], open: false, image: '', sending: false, mine: [], jump: false };
+  const lsGet = k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  try { chat.mine = JSON.parse(lsGet('lafes_chat_mine') || '[]'); } catch (e) { chat.mine = []; }
+  function chatTime(at) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(at || '');
+    if (!m) return '';
+    const now = new Date();
+    const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const hm = m[4] + ':' + m[5];
+    return (m[1] + '-' + m[2] + '-' + m[3]) === today ? hm : Number(m[2]) + '/' + Number(m[3]) + ' ' + hm;
+  }
+  function renderChat() {
+    const box = document.getElementById('chatList');
+    const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+    if (!chat.list.length) { box.innerHTML = '<p class="empty">まだつぶやきはありません。<br>最初のひとことをどうぞ。</p>'; return; }
+    box.innerHTML = chat.list.map(c =>
+      '<div class="msg' + (chat.mine.indexOf(c.id) >= 0 ? ' mine' : '') + '"><div class="mh"><b>' + esc(c.name) + '</b><span>' + esc(chatTime(c.at)) + '</span></div>' +
+      '<div class="mt">' + esc(c.text) + '</div>' +
+      (c.imageId ? '<img data-img="' + esc(c.imageId) + '" alt="' + esc(c.name) + 'さんの写真">' : '') + '</div>'
+    ).join('');
+    hydrateImages(box);
+    if (nearBottom || chat.jump) { box.scrollTop = box.scrollHeight; chat.jump = false; }
+  }
+  function updateBadge() {
+    const seen = lsGet('lafes_chat_seen');
+    const n = chat.open ? 0 : chat.list.filter(c => c.at > seen && chat.mine.indexOf(c.id) < 0).length;
+    const b = document.getElementById('chatBadge');
+    b.hidden = !n; b.textContent = n > 99 ? '99+' : String(n);
+  }
+  function markSeen() {
+    if (chat.list.length) lsSet('lafes_chat_seen', chat.list[chat.list.length - 1].at);
+    updateBadge();
+  }
+  function loadChat() {
+    if (document.hidden) return Promise.resolve();
+    return call('getChat').then(list => {
+      const next = list || [];
+      const changed = next.map(c => c.id).join() !== chat.list.map(c => c.id).join();
+      chat.list = next;
+      if (chat.open && changed) { renderChat(); markSeen(); }
+      updateBadge();
+    }).catch(() => {});
+  }
+  function openChat() {
+    chat.open = true; chatEl.hidden = false;
+    document.getElementById('chatFab').setAttribute('aria-expanded', 'true');
+    if (window.matchMedia('(max-width: 719px)').matches) document.body.style.overflow = 'hidden';
+    chat.jump = true; renderChat(); markSeen();
+    const nm = document.getElementById('chatName');
+    if (!nm.value) nm.value = lsGet('lafes_chat_name');
+    loadChat();
+  }
+  function closeChat() {
+    chat.open = false; chatEl.hidden = true;
+    document.getElementById('chatFab').setAttribute('aria-expanded', 'false');
+    if ($modal.hidden) document.body.style.overflow = '';
+    markSeen();
+  }
+  function chatCount() {
+    const n = document.getElementById('chatText').value.trim().length;
+    const el = document.getElementById('chatCnt');
+    el.textContent = n + '/' + CHAT_MAX; el.classList.toggle('over', n > CHAT_MAX);
+  }
+  function clearChatImage() {
+    chat.image = '';
+    const pv = document.getElementById('chatPv'); pv.hidden = true; pv.innerHTML = '';
+  }
+  function initChat() {
+    document.getElementById('chatFab').addEventListener('click', () => chat.open ? closeChat() : openChat());
+    document.getElementById('chatClose').addEventListener('click', closeChat);
+    document.getElementById('chatText').addEventListener('input', chatCount);
+    document.getElementById('chatFile').addEventListener('change', ev => {
+      const f = ev.target.files && ev.target.files[0];
+      ev.target.value = '';
+      if (!f) return;
+      shrinkImage(f).then(data => {
+        chat.image = data;
+        const pv = document.getElementById('chatPv');
+        pv.innerHTML = '<img src="' + data + '" alt=""><span>写真をつけます</span><button type="button" id="chatPvDel">外す</button>';
+        pv.hidden = false;
+        document.getElementById('chatPvDel').addEventListener('click', clearChatImage);
+      }).catch(e => toast(e.message));
+    });
+    document.getElementById('chatList').addEventListener('click', ev => {
+      const img = ev.target.closest('.msg img');
+      if (!img || !img.src) return;
+      const v = document.createElement('div');
+      v.className = 'imgview'; v.innerHTML = '<img src="' + img.src.replace(/sz=w\d+/, 'sz=w1600') + '" alt="">';
+      v.addEventListener('click', () => v.remove());
+      document.body.appendChild(v);
+    });
+    document.getElementById('chatForm').addEventListener('submit', ev => {
+      ev.preventDefault();
+      if (chat.sending) return;
+      const nameEl = document.getElementById('chatName'), textEl = document.getElementById('chatText');
+      const name = nameEl.value.trim(), text = textEl.value.trim();
+      if (!name) { toast('名前を入れてください'); nameEl.focus(); return; }
+      if (!text) { toast('本文を入れてください'); textEl.focus(); return; }
+      if (text.length > CHAT_MAX) { toast('本文は' + CHAT_MAX + '文字までです'); return; }
+      lsSet('lafes_chat_name', name);
+      chat.sending = true;
+      const btn = document.getElementById('chatSend'); btn.disabled = true; btn.textContent = '送信中…';
+      const before = chat.list.map(c => c.id);
+      call('postChat', { name: name, text: text }, chat.image || '').then(list => {
+        chat.list = list || [];
+        // 自分の投稿は枠の色を変える（この端末だけの印）
+        const mineNew = chat.list.filter(c => before.indexOf(c.id) < 0 && c.name === name && c.text === text).map(c => c.id);
+        chat.mine = chat.mine.concat(mineNew).slice(-200); lsSet('lafes_chat_mine', JSON.stringify(chat.mine));
+        textEl.value = ''; chatCount(); clearChatImage();
+        chat.jump = true; renderChat(); markSeen();
+      }).catch(e => toast(e.message)).then(() => {
+        chat.sending = false; btn.disabled = false; btn.textContent = '送る';
+      });
+    });
+    document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && chat.open && $modal.hidden) closeChat(); });
+    loadChat();
+    setInterval(() => { if (chat.open) loadChat(); }, 30000);
+    setInterval(() => { if (!chat.open) loadChat(); }, 60000);
+  }
+
   // ---------- 起動（ファイルの最後で呼ぶ） ----------
   function start() {
     Promise.all([call('getBootstrap'), getParams()]).then(([boot, params]) => {
@@ -1387,6 +1576,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
       const hash = IS_GAS ? '' : location.hash.slice(1);
       state.view = VIEWS.indexOf(params.page || hash) >= 0 ? (params.page || hash) : 'top';
       render();
+      initChat();
       // ?s=セッションID で、そのセッションの詳細を開く（告知用のリンク）
       if (params.s) {
         const s = state.sessions.find(x => x.id === params.s);
@@ -1468,6 +1658,7 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
     }
     function save() { try { localStorage.setItem(KEY, JSON.stringify({ list: list, images: images })); } catch (e) {} }
     let list = load();
+    const chatList = [];
     const stamp = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
     const wait = v => new Promise(r => setTimeout(() => r(JSON.parse(JSON.stringify(v))), 200));
     const fail = m => new Promise((_, rej) => setTimeout(() => rej(new Error(m)), 200));
@@ -1491,6 +1682,13 @@ label.f .opt { color: var(--muted); font-size: 12px; margin-left: 4px; font-weig
         else if (imageData === '') next.imageId = '';
         list = list.map(s => s.id === id ? next : s); save();
         return wait(next);
+      },
+      getChat: () => wait(chatList),
+      postChat: (d, imageData) => {
+        if (!d.name || !d.text) return fail('名前と本文を入れてください。');
+        if (d.text.length > 140) return fail('本文は140文字までです。');
+        chatList.push({ id: 'C' + Date.now().toString(36), at: stamp(), name: d.name, text: d.text, imageId: imageData ? putImage(imageData) : '' });
+        return wait(chatList);
       },
       deleteSession: id => {
         if (!list.find(s => s.id === id)) return fail('このセッションは見つかりませんでした。すでに削除されたかもしれません。');
